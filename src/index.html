@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Truth Staking</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="container" style="width: 650px;">
+      <div class="row">
+        <div class="col-lg-12">
+          <h1 class="text-center">Truth Staking</h1>
+          <hr/>
+          <br/>
+          <div id="loader">
+            <p class="text-center">Loading...</p>
+          </div>
+          <div id="content" style="display: none;">
+            <h1 id="absEthStaked" class="text-center"></h1>
+            <h3 class="text-center">ETH staked overall</h3>
+            <br/>
+            <hr/>
+            <br/>
+            <!-- <h2 id="absEthStaked" class="text-center"></h2> -->
+            <br/>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col"># Stakes</th>
+                  <th scope="col">Statement</th>
+                </tr>
+              </thead>
+              <tbody id="statementInfo">
+              </tbody>
+            </table>
+            <br/>
+            <hr/>
+            <div class="stake-selection">
+              <h2 class="text-center">Stake on a statement</h2>
+              <hr/>
+              <form onSubmit="App.makeStake(); return false;">
+                <label for="statementIdToStake">Statement ID: </label>
+                <input type="number" id="statementIdToStake" placeholder="1" step="1"/>
+                <br/>
+                <br/>
+                <div class="form-group">
+                  <label for="positionSelect">Select Position</label>
+                  <select class="form-control" id="positionSelect"></select>
+                </div>
+                <label for="stakeValue">Stake Amount: </label>
+                <input type="number" id="stakeValue" placeholder="1.000 ether" step="0.000000000000000001"/>
+                <button type="submit" class="btn btn-primary">Stake</button>
+                
+                <hr />
+              </form>
+            </div>
+
+            <div class="new-statement">
+              <h2 class="text-center">Create new statement</h2>
+              <hr/>
+              <form onSubmit="App.makeNewStatement();">
+                <label for="newStatementString">Enter new statement: </label>
+                <input type="text" id="newStatementString" placeholder="This sentence is false."/>
+                <br/>
+                <label for="newStatementStakingPeriod">Set staking period (seconds): </label>
+                <input type="number" id="newStatementStakingPeriod" placeholder="3600"/>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+            <!-- <p id="timeRemaining" class="text-center"></p> -->
+            <br/>
+            <p id="accountAddress" class="text-center"></p>
+            
+            <form onSubmit="App.endStakeNow();">
+              <button type="submit" class="btn btn-primary">End Stake</button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/web3.min.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
