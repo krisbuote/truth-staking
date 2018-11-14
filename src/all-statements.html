@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Truth Staking</title>
+    <title>All Statements</title>
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -17,6 +17,7 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
   </head>
+
   <nav>
     <nav class="navbar navbar-inverse">
     <div class="container-fluid">
@@ -28,14 +29,14 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" ref="./index.html">TS</a>
+        <a class="navbar-brand" href="./index.html">TS</a>
       </div>
 
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav">
           <li><a href="./staking-history.html">Staking History <span class="sr-only">(current)</span></a></li>
-          <li><a href="./all-statements.html">All Statements</a></li>
+          <li class="active"><a href="./all-statements.html">All Statements</a></li>
 
           
         </ul>
@@ -63,24 +64,19 @@
   </nav>
 
 
+
+
   <body>
     <div class="container" style="width: 650px;">
       <div class="row">
         <div class="col-lg-12">
-          <h1 class="text-center">Truth Staking</h1>
+          <h1 class="text-center">All Statenebts</h1>
           <hr/>
           <br/>
           <div id="loader">
             <p class="text-center">Loading...</p>
           </div>
           <div id="content" style="display: none;">
-            <h1 id="absEthStaked" class="text-center"></h1>
-            <h3 class="text-center">ETH staked overall</h3>
-            <br/>
-            <hr/>
-            <br/>
-            <!-- <h2 id="absEthStaked" class="text-center"></h2> -->
-            <br/>
             <table class="table">
               <thead>
                 <tr>
@@ -93,7 +89,6 @@
               </tbody>
             </table>
             <br/>
-            <a href="./staking-history.html" class="btn btn-default">See all statements ></a>
             <hr/>
             <div class="stake-selection">
               <h2 class="text-center">Stake on a statement</h2>

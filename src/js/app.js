@@ -6,12 +6,12 @@ const contractAddress = '0xe30c76fed6e88dd46889406eb3e5eb623e05361d' // from eth
 
 // From remix, or import from JSON build file (better choice)
 const contractABI = [{"constant":true,"inputs":[],"name":"absNumStatements","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_statementID","type":"uint256"}],"name":"endStake","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"absEthStaked","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_statement","type":"string"},{"name":"_stakingTime","type":"uint256"}],"name":"newStatement","outputs":[{"name":"statementID","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_statementID","type":"uint256"},{"name":"_position","type":"uint256"}],"name":"stake","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"statements","outputs":[{"name":"id","type":"uint256"},{"name":"statement","type":"string"},{"name":"stakeEndTime","type":"uint256"},{"name":"marketMaker","type":"address"},{"name":"numStakes","type":"uint256"},{"name":"stakeEnded","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"absNumStakes","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"statementID","type":"uint256"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"NewStake","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"finalPot","type":"uint256"}],"name":"StakeEnded","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"statementID","type":"uint256"},{"indexed":false,"name":"potBalance","type":"uint256"}],"name":"CurrentPot","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"position","type":"uint256"}],"name":"MajorityStaked","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"statement","type":"string"},{"indexed":false,"name":"stakeEndTime","type":"uint256"}],"name":"NewStatement","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"statementID","type":"uint256"},{"indexed":false,"name":"stakerAddr","type":"address"},{"indexed":false,"name":"amount","type":"uint256"},{"indexed":false,"name":"stakedPosition","type":"uint256"}],"name":"CorrectStake","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"loopNumber","type":"uint256"}],"name":"LoopCheck","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"statementID","type":"uint256"}],"name":"StatementIDCheck","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"rewardTransfered","type":"uint256"}],"name":"RewardCheck","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"profitCalculated","type":"uint256"}],"name":"ProfitCheck","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"TPotValue","type":"uint256"},{"indexed":false,"name":"FPotValue","type":"uint256"}],"name":"PotsCheck","type":"event"}] // from Remix web3deploy first line
-// var truthstakeContract = new web3.eth.Contract(contractABI, contractAddress);
+// var truthStakingContract = new web3.eth.Contract(contractABI, contractAddress);
 
 
 App = {
 	web3Provider: null,
-  	truthStakeContract: null,
+  	truthStakingContract: null,
   	account: '0x0',
 
 	init: function() {
@@ -37,12 +37,9 @@ App = {
 	initContract: function() {
 		console.log('initContract');
 
-		// App.truthStakeContract = new web3.eth.Contract(contractABI, contractAddress);
-		// App.truthStakeContract = web3.eth.contract(contractABI, contractAddress);
-		App.truthStakeContract = web3.eth.contract(contractABI);
+		App.truthStakingContract = web3.eth.contract(contractABI);
 
-
-		console.log(App.truthStakeContract);
+		console.log(App.truthStakingContract);
 		console.log(App.contractInstance);
 		return App.render();
 	},
@@ -65,7 +62,7 @@ App = {
 	    });
 
 	    // Instantiate contract instance
-		var contractInstance = App.truthStakeContract.at(contractAddress);
+		var contractInstance = App.truthStakingContract.at(contractAddress);
 
 		// Display the total Ether staked so far
 		contractInstance.absEthStaked(function(error, absEthStaked) {
@@ -149,7 +146,7 @@ App = {
 			from: App.account
 		}
 
-		var contractInstance = App.truthStakeContract.at(contractAddress);
+		var contractInstance = App.truthStakingContract.at(contractAddress);
 		contractInstance.newStatement(newStatementString, newStatementStakingPeriod, txObject, function(err, result) {
 			if(!err) {
 				console.log("makeNewStatement success! new statementID: ", result)
@@ -182,7 +179,7 @@ App = {
 
 
 
-		var contractInstance = App.truthStakeContract.at(contractAddress);
+		var contractInstance = App.truthStakingContract.at(contractAddress);
 
 		var txObject = {
 			from: App.account, 

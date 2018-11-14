@@ -5,7 +5,7 @@
 
 pragma solidity ^0.4.2;
 
-contract TruthStakeMultiple {
+contract TruthStaking {
 	// Create a pot that tracks Ether staked on True (T) vs. False (F)
 	// Must keep sub-pots private, but totalPot value should be public
 
@@ -128,7 +128,7 @@ contract TruthStakeMultiple {
 		require(!s.stakeEnded, "endStake has already been called.");
 
 		// 2. Effects
-		s.stakeEnded = true;
+		s.stakeEnded = true;  //////// TODO: HAS NO EFFECT
 		uint winningPosition;
 
 		// find majority position. TODO: Handle ties.
