@@ -5,9 +5,14 @@
 
 pragma solidity ^0.4.2;
 
-contract TruthStaking {
+import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
+
+contract TruthStaking is SafeMath{
 	// Create a pot that tracks Ether staked on True (T) vs. False (F)
 	// Must keep sub-pots private, but totalPot value should be public
+	using SafeMath as uint
+	uint two_to_the_256_power_minus_one = 115792089237316195423570985008687907853269984665640564039457584007913129639935; //2 to the 256 power minus 1
+    uint more = two_to_the_256_power_minus_one + two_to_the_256_power_minus_one;
 
 	struct Statement {
 		uint id;
