@@ -11,8 +11,6 @@ contract TruthStaking is SafeMath{
 
 	using SafeMath as uint
 
-	////////////////////// STRUCTS //////////////////////
-
 	struct Statement {
 		uint id;
 		string statement;
@@ -44,18 +42,11 @@ contract TruthStaking is SafeMath{
 	mapping(uint => Statement) public statements; //////////TODO: Make private and use events to get info?
 	mapping(uint => Pot) private pots;  /////////// TODO: Put pot mapping in statement too?
 
-	////////////////////// STATE VARIABLES //////////////////////
-
-	// Information Trackers
+	// State Variables
 	uint public absNumStatements;
 	uint public absNumStakes;
 	uint public absEthStaked;
-
-	// Logistics
-	address owner;
-	uint serviceFeePct; // This is a 3 digit int to accomodate precision of hundreths. eg. 1.25% is represented as 125
-
-	////////////////////// EVENTS //////////////////////
+	uint public serviceFeePct = 0.0175;
 
     // Events that will be emitted on changes.
     event NewStake(uint statementID, uint amount);
@@ -74,20 +65,9 @@ contract TruthStaking is SafeMath{
 
 
 	// Constructor executes once when contract is created
-	constructor () public {
-		owner = msg.sender;
-	}
-
-	////////////////////// MODIFIERS //////////////////////
-    modifier onlyOwner {
-        require(
-            msg.sender == owner,
-            "Only owner can call this function."
-        );
-        _;
-    }
-
-	////////////////////// FUNCTIONS //////////////////////
+	// constructor () public {
+	// 	newStatement("This statement is false", 1325000000);
+	// }
 
 	function newStatement(string _statement, uint _stakingTime) public returns(uint statementID) {
 		require(bytes(_statement).length > 0, "requires bytes(statement) > 0. Possibly empty string given.");
@@ -155,6 +135,18 @@ contract TruthStaking is SafeMath{
 
 		// 2. Effects
 		s.stakeEnded = true;  //////// TODO: HAS NO EFFECT
+		uint winningPosition;
+
+		// find majority position. TODO: Handle ties.
+		Pot memory p = pots[_statementID];
+
+		// If the majority staked on true
+		if ( p.T >= p.F ) {
+			winningPosition = 1;
+		}
+		else {
+			winningPosition = 0;
+		}
 
 		// Emit the total pot value and winning position at end of stake
 		emit StakeEnded(p.total);
@@ -162,12 +154,12 @@ contract TruthStaking is SafeMath{
 
 		// 3. Interactions
 		// distribute pot between winners, proportional to their stake
-		distribute(_statementID);
+		distribute(_statementID, winningPosition);
 	}
 
 	// TODO: Consider a withdraw function rather than automated distribution
 
-	function distribute(uint _statementID) private {
+	function distribute(uint _statementID, uint _winningPosition) private {
 
 		uint profit; // CHECK math and rounding here
 		uint reward; // CHECK math and rounding here
@@ -194,8 +186,7 @@ contract TruthStaking is SafeMath{
 		}
 
 		// Platform service fee
-		///////////////////////// TODO: MATH AND ROUNDING ISSUE HERE IF FEE < ~10000 or something
-		fee = losingPot * serviceFeePct / 100;
+		fee = losingPot * serviceFeePct;
 		losingPot -= fee;
 
 		// Loop through stakes, distribute their money
@@ -206,11 +197,22 @@ contract TruthStaking is SafeMath{
 
 			// If the staker's position matched the majority
 			// They receive their original stake + proportion of loser's stakes
-			if (s.stakes[i].position == winningPosition) {
+			if (s.stakes[i].position == _winningPosition) {
 
+				// Profit = (proportion of correct pot staked) * (opposition's pot) 
+				// emit CorrectStake(_statementID, s.stakes[i].addr, s.stakes[i].stake, s.stakes[i].position);
+				
+				// If the majority staked on true
+				if (_winningPosition == 1) {
+					profit = s.stakes[i].amount * FPot / TPot; // truncated at singular Wei level if odd
+				}
+				else {
+					profit = s.stakes[i].amount * TPot / FPot;
+				}
 
-				// Calculate profit for correct staker
-				profit = s.stakes[i].amount * losingPot / winningPot;
+				///////// ALT REWARD CALC
+				// profit = s.stakes[i].amount * losingPot / winningPot;
+				/////////
 
 				emit ProfitCheck(profit);
 
@@ -227,19 +229,6 @@ contract TruthStaking is SafeMath{
 
 		owner.transfer(fee);
 
-
-	}
-
-	function setServiceFeePct(uint _newServiceFeePct) public onlyOwner {
-		// _newServiceFeePct should be desired fee percentage * 100.
-		// e.g. if service fee of 1.75% is desired, _newServiceFeePct = 175
-		require(_newServiceFeePct >= 0, 'Service Fee cannot be less than 0%.');
-		require(_newServiceFeePct <= 10000, 'Service Fee cannot be greater than 100%.')
-		serviceFeePct = _newServiceFeePct;
-	}
-
-	function transferOwnership(address _newOwner) public onlyOwner {
-		owner = _newOwnerAddress;
 
 	}
 
