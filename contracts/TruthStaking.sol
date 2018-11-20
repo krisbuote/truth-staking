@@ -7,9 +7,9 @@ pragma solidity ^0.4.2;
 
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 
-contract TruthStaking is SafeMath{
+contract TruthStaking is SafeMath {
 
-	using SafeMath as uint
+	using SafeMath for uint;
 
 	////////////////////// STRUCTS //////////////////////
 
@@ -20,6 +20,7 @@ contract TruthStaking is SafeMath{
 		address marketMaker;
 		uint numStakes;
 		bool stakeEnded;
+		string source;
 		mapping(uint => Stake) stakes; // TODO: Make private?
 	}
 
@@ -41,8 +42,18 @@ contract TruthStaking is SafeMath{
 		//////////// TODO: Store stakes in here with position/amount . Private!
 	}
 
+	struct Beneficiary {
+		address benAddr;
+		uint potProportionTenThousandths;
+	}
+
+
+	// MAPPINGS AND ARRAYS
 	mapping(uint => Statement) public statements; //////////TODO: Make private and use events to get info?
 	mapping(uint => Pot) private pots;  /////////// TODO: Put pot mapping in statement too?
+	mapping(address => uint) public beneficiaryShares;
+
+	address[] private beneficiaryAddresses;
 
 	////////////////////// STATE VARIABLES //////////////////////
 
@@ -52,17 +63,17 @@ contract TruthStaking is SafeMath{
 	uint public absEthStaked;
 
 	// Logistics
-	address owner;
-	uint serviceFeePct; // This is a 3 digit int to accomodate precision of hundreths. eg. 1.25% is represented as 125
+	address private owner;
+	uint public serviceFeeTenThousandths; // This is a 4 digit int to accomodate precision of ten-thosaundths. eg. 1.25% is represented as 125
 
 	////////////////////// EVENTS //////////////////////
 
     // Events that will be emitted on changes.
     event NewStake(uint statementID, uint amount);
-    event StakeEnded(uint finalPot);
+    event StakeEnded(uint statementID, uint finalPot);
     event CurrentPot(uint statementID, uint potBalance);
-    event MajorityStaked(uint position);
-   	event NewStatement(string statement, uint stakeEndTime);
+    event MajorityStaked(uint statementID, uint position);
+   	event NewStatement(uint statementID, string statement, uint stakeEndTime);
 
    	// Events for debugging
    	event CorrectStake(uint statementID, address stakerAddr, uint amount, uint stakedPosition);
@@ -89,17 +100,17 @@ contract TruthStaking is SafeMath{
 
 	////////////////////// FUNCTIONS //////////////////////
 
-	function newStatement(string _statement, uint _stakingTime) public returns(uint statementID) {
+	function newStatement(string _statement, uint _stakingTime, string _source) public returns(uint statementID) {
 		require(bytes(_statement).length > 0, "requires bytes(statement) > 0. Possibly empty string given.");
 
 		uint stakeEndTime;
 
 		stakeEndTime = now + _stakingTime;
 		statementID = absNumStatements++; //sets statementID and THEN increases absNumStatements by 1
-		statements[statementID] = Statement(statementID, _statement, stakeEndTime, msg.sender, 0, false);
+		statements[statementID] = Statement(statementID, _statement, stakeEndTime, msg.sender, 0, false, _source);
 		pots[statementID] = Pot(0, 0, 0);
 
-		emit NewStatement(_statement, stakeEndTime);
+		emit NewStatement(statementID, _statement, stakeEndTime);
 	}
 
 	function stake(uint _statementID, uint _position) public payable { // returns( ) necessary? 
@@ -117,8 +128,8 @@ contract TruthStaking is SafeMath{
 		s.stakes[s.numStakes++] = Stake({addr:msg.sender, amount:msg.value, position:_position});
 
 		// Add the stake to total pot
-		addToPot(msg.value, _position, _statementID);
 		emit NewStake(_statementID, msg.value);
+		addToPot(msg.value, _position, _statementID);
 
 		// Add to global trackers
 		absNumStakes++;
@@ -156,10 +167,6 @@ contract TruthStaking is SafeMath{
 		// 2. Effects
 		s.stakeEnded = true;  //////// TODO: HAS NO EFFECT
 
-		// Emit the total pot value and winning position at end of stake
-		emit StakeEnded(p.total);
-		emit MajorityStaked(winningPosition);
-
 		// 3. Interactions
 		// distribute pot between winners, proportional to their stake
 		distribute(_statementID);
@@ -174,6 +181,7 @@ contract TruthStaking is SafeMath{
 		uint winningPot;
 		uint losingPot;
 		uint winningPosition;
+		uint potRemaining;
 
 
 		// TODO storage or memory?
@@ -193,54 +201,82 @@ contract TruthStaking is SafeMath{
 			winningPosition = 0;
 		}
 
+		// Emit the total pot value and winning position at end of stake
+		emit StakeEnded(_statementID, p.total);
+		emit MajorityStaked(_statementID, winningPosition);
+
 		// Platform service fee
 		///////////////////////// TODO: MATH AND ROUNDING ISSUE HERE IF FEE < ~10000 or something
-		fee = losingPot * serviceFeePct / 100;
+		uint fee;
+		fee = losingPot * serviceFeeTenThousandths / 10000;
 		losingPot -= fee;
 
-		// Loop through stakes, distribute their money
-		// Confirm i < stakeIndex is correct 
-		for (uint i = 0; i < s.numStakes; i++) {
+		// Beneficiaries 
+		uint arrayLength = beneficiaryAddresses.length;
+		uint cut;
 
-			// emit LoopCheck(i);
+		for (uint i = 0; i < arrayLength; i++) {
+			address beneficiary;
+			beneficiary = beneficiaryAddresses[i];
+			cut = 0;
+			cut = beneficiaryShares[beneficiary] / 10000 * losingPot;
+			losingPot -= cut;
+			beneficiary.transfer(cut);
+
+		}
+
+		// Stakers Rewards
+		uint stakersPot = losingPot;
+
+		for (uint j = 0; j < s.numStakes; j++) {
+
+			// emit LoopCheck(j);
 
 			// If the staker's position matched the majority
 			// They receive their original stake + proportion of loser's stakes
-			if (s.stakes[i].position == winningPosition) {
-
+			if (s.stakes[j].position == winningPosition) {
 
 				// Calculate profit for correct staker
-				profit = s.stakes[i].amount * losingPot / winningPot;
-
+				profit = s.stakes[j].amount * stakersPot / winningPot;
 				emit ProfitCheck(profit);
 
 				// Their reward is original stake + profit
-				reward = s.stakes[i].amount + profit;
+				reward = s.stakes[j].amount + profit;
 				emit RewardCheck(reward);
+				losingPot -= reward;
 
 				// Send the winner their reward
-				s.stakes[i].addr.transfer(reward);
+				s.stakes[j].addr.transfer(reward);
 
 			}
 
 		}
 
-		owner.transfer(fee);
+		/////// TODO: CHECK fee == losingPot HERE
+		owner.transfer(losingPot);
 
 
 	}
 
-	function setServiceFeePct(uint _newServiceFeePct) public onlyOwner {
-		// _newServiceFeePct should be desired fee percentage * 100.
-		// e.g. if service fee of 1.75% is desired, _newServiceFeePct = 175
-		require(_newServiceFeePct >= 0, 'Service Fee cannot be less than 0%.');
-		require(_newServiceFeePct <= 10000, 'Service Fee cannot be greater than 100%.')
-		serviceFeePct = _newServiceFeePct;
+	function setServiceFeeTenThousandths(uint _newServiceFeeTenThousandths) public onlyOwner {
+		// _newServiceFeeTenThousandths should be desired fee percentage * 100.
+		// e.g. if service fee of 1.75% is desired, _newServiceFeeTenThousandths = 175
+		require(_newServiceFeeTenThousandths >= 0, 'Service Fee cannot be less than 0%.');
+		require(_newServiceFeeTenThousandths <= 10000, 'Service Fee cannot be greater than 100%.');
+		serviceFeeTenThousandths = _newServiceFeeTenThousandths;
+	}
+
+	function addBeneficiary(address _beneficiaryAddress, uint _potProportionTenThousandths) public onlyOwner {
+		// _potProportionTenThousandths should be desired percentage * 100.
+		// e.g. if a pot cut of 0.35% is desired, _potProportionTenThousandths = 35
+		require(_potProportionTenThousandths >= 0, 'Service Fee cannot be less than 0%.');
+		require(_potProportionTenThousandths <= 10000, 'Service Fee cannot be greater than 100%.');
+		beneficiaryAddresses.push(_beneficiaryAddress);
+		beneficiaryShares[_beneficiaryAddress] = _potProportionTenThousandths;
 	}
 
 	function transferOwnership(address _newOwner) public onlyOwner {
-		owner = _newOwnerAddress;
-
+		owner = _newOwner;
 	}
 
 

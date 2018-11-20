@@ -9,7 +9,7 @@ import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 
 contract TruthStaking is SafeMath{
 
-	using SafeMath as uint
+	using SafeMath for uint;
 
 	struct Statement {
 		uint id;
@@ -46,7 +46,8 @@ contract TruthStaking is SafeMath{
 	uint public absNumStatements;
 	uint public absNumStakes;
 	uint public absEthStaked;
-	uint public serviceFeePct = 0.0175;
+	uint public serviceFeePct;
+	// address private owner;
 
     // Events that will be emitted on changes.
     event NewStake(uint statementID, uint amount);
@@ -166,6 +167,8 @@ contract TruthStaking is SafeMath{
 		uint winningPot;
 		uint losingPot;
 		uint winningPosition;
+		uint FPot;
+		uint TPot;
 
 
 		// TODO storage or memory?
@@ -173,21 +176,24 @@ contract TruthStaking is SafeMath{
 		Pot memory p = pots[_statementID];
 		emit CurrentPot(_statementID, p.total);
 
+		TPot = p.T;
+		FPot = p.F;
 
-		if (p.T >= p.F) {
-			winningPot = p.T;
-			losingPot = p.F;
-			winningPosition = 1;
-		}
-		else {
-			winningPot = p.F;
-			losingPot = p.T;
-			winningPosition = 0;
-		}
+		// if (p.T >= p.F) {
+		// 	winningPot = p.T;
+		// 	losingPot = p.F;
+		// 	winningPosition = 1;
+		// }
+		// else {
+		// 	winningPot = p.F;
+		// 	losingPot = p.T;
+		// 	winningPosition = 0;
+		// }
 
-		// Platform service fee
-		fee = losingPot * serviceFeePct;
-		losingPot -= fee;
+		// // Platform service fee
+		// uint fee
+		// fee = losingPot * serviceFeePct;
+		// losingPot -= fee;
 
 		// Loop through stakes, distribute their money
 		// Confirm i < stakeIndex is correct 
@@ -227,7 +233,7 @@ contract TruthStaking is SafeMath{
 
 		}
 
-		owner.transfer(fee);
+		// owner.transfer(fee);
 
 
 	}
