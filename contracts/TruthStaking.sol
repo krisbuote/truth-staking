@@ -5,9 +5,72 @@
 
 pragma solidity ^0.4.2;
 
-import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
+/**
+ * @title SafeMath
+ * @dev Math operations with safety checks that revert on error
+ */
+library SafeMath {
 
-contract TruthStaking is SafeMath {
+  /**
+  * @dev Multiplies two numbers, reverts on overflow.
+  */
+  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+    // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
+    // benefit is lost if 'b' is also tested.
+    // See: https://github.com/OpenZeppelin/openzeppelin-solidity/pull/522
+    if (a == 0) {
+      return 0;
+    }
+
+    uint256 c = a * b;
+    require(c / a == b);
+
+    return c;
+  }
+
+  /**
+  * @dev Integer division of two numbers truncating the quotient, reverts on division by zero.
+  */
+  function div(uint256 a, uint256 b) internal pure returns (uint256) {
+    require(b > 0); // Solidity only automatically asserts when dividing by 0
+    uint256 c = a / b;
+    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+
+    return c;
+  }
+
+  /**
+  * @dev Subtracts two numbers, reverts on overflow (i.e. if subtrahend is greater than minuend).
+  */
+  function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+    require(b <= a);
+    uint256 c = a - b;
+
+    return c;
+  }
+
+  /**
+  * @dev Adds two numbers, reverts on overflow.
+  */
+  function add(uint256 a, uint256 b) internal pure returns (uint256) {
+    uint256 c = a + b;
+    require(c >= a);
+
+    return c;
+  }
+
+  /**
+  * @dev Divides two numbers and returns the remainder (unsigned integer modulo),
+  * reverts when dividing by zero.
+  */
+  function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+    require(b != 0);
+    return a % b;
+  }
+}
+
+
+contract TruthStaking {
 
 	using SafeMath for uint;
 
@@ -48,7 +111,8 @@ contract TruthStaking is SafeMath {
 	}
 
 
-	// MAPPINGS AND ARRAYS
+	////////////////////// MAPPINGS AND ARRAYS //////////////////////
+
 	mapping(uint => Statement) public statements; //////////TODO: Make private and use events to get info?
 	mapping(uint => Pot) private pots;  /////////// TODO: Put pot mapping in statement too?
 	mapping(address => uint) public beneficiaryShares;
@@ -117,7 +181,9 @@ contract TruthStaking is SafeMath {
 
 	    // Revert the call if the staking period is over or if insufficient value transacted
 		require(msg.value > 0, "Insufficient stake value.");
+
 		//// TODO: require(address exists)?
+
 		require(_position == 0 || _position == 1, "Invalid position to stake on."); 
 		require(_statementID < absNumStatements && _statementID >= 0, "Invalid Statement ID.");
 
@@ -157,7 +223,7 @@ contract TruthStaking is SafeMath {
 	function endStake(uint _statementID) public {
 
 		// TODO: storage or memory???
-		Statement memory s = statements[_statementID];
+		Statement storage s = statements[_statementID];
 
 		// 1. Conditions
 		// Require that sufficient time has passed and endStake has not already been called
@@ -165,7 +231,7 @@ contract TruthStaking is SafeMath {
 		require(!s.stakeEnded, "endStake has already been called.");
 
 		// 2. Effects
-		s.stakeEnded = true;  //////// TODO: HAS NO EFFECT
+		s.stakeEnded = true;  //////// TODO: HAS NO EFFECT (update: switched to storage, works now?)
 
 		// 3. Interactions
 		// distribute pot between winners, proportional to their stake
@@ -177,11 +243,11 @@ contract TruthStaking is SafeMath {
 	function distribute(uint _statementID) private {
 
 		uint profit; // CHECK math and rounding here
-		uint reward; // CHECK math and rounding here
+		uint reward; 
 		uint winningPot;
 		uint losingPot;
 		uint winningPosition;
-		uint potRemaining;
+		uint potRemaining; // CHECK math and rounding here
 
 
 		// TODO storage or memory?
@@ -213,13 +279,11 @@ contract TruthStaking is SafeMath {
 
 		// Beneficiaries 
 		uint arrayLength = beneficiaryAddresses.length;
-		uint cut;
 
 		for (uint i = 0; i < arrayLength; i++) {
-			address beneficiary;
-			beneficiary = beneficiaryAddresses[i];
-			cut = 0;
-			cut = beneficiaryShares[beneficiary] / 10000 * losingPot;
+			address beneficiary = beneficiaryAddresses[i];
+			uint cut;
+			cut = losingPot * beneficiaryShares[beneficiary] / 10000;
 			losingPot -= cut;
 			beneficiary.transfer(cut);
 
@@ -255,7 +319,6 @@ contract TruthStaking is SafeMath {
 		/////// TODO: CHECK fee == losingPot HERE
 		owner.transfer(losingPot);
 
-
 	}
 
 	function setServiceFeeTenThousandths(uint _newServiceFeeTenThousandths) public onlyOwner {
@@ -266,13 +329,15 @@ contract TruthStaking is SafeMath {
 		serviceFeeTenThousandths = _newServiceFeeTenThousandths;
 	}
 
-	function addBeneficiary(address _beneficiaryAddress, uint _potProportionTenThousandths) public onlyOwner {
+	function addBeneficiaryCutTenThousandths(address _beneficiaryAddress, uint _potProportionTenThousandths) public onlyOwner {
 		// _potProportionTenThousandths should be desired percentage * 100.
 		// e.g. if a pot cut of 0.35% is desired, _potProportionTenThousandths = 35
-		require(_potProportionTenThousandths >= 0, 'Service Fee cannot be less than 0%.');
-		require(_potProportionTenThousandths <= 10000, 'Service Fee cannot be greater than 100%.');
+		require(_potProportionTenThousandths >= 0, 'Beneficiary cut cannot be less than 0%.');
+		require(_potProportionTenThousandths <= 10000, 'Beneficiary cut cannot be greater than 100%.');
 		beneficiaryAddresses.push(_beneficiaryAddress);
 		beneficiaryShares[_beneficiaryAddress] = _potProportionTenThousandths;
+
+		// TODO: Test you can set address cut back to zero
 	}
 
 	function transferOwnership(address _newOwner) public onlyOwner {
