@@ -5,70 +5,8 @@
 
 pragma solidity ^0.4.2;
 
-/**
- * @title SafeMath
- * @dev Math operations with safety checks that revert on error
- */
-library SafeMath {
-
-  /**
-  * @dev Multiplies two numbers, reverts on overflow.
-  */
-  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-    // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
-    // benefit is lost if 'b' is also tested.
-    // See: https://github.com/OpenZeppelin/openzeppelin-solidity/pull/522
-    if (a == 0) {
-      return 0;
-    }
-
-    uint256 c = a * b;
-    require(c / a == b);
-
-    return c;
-  }
-
-  /**
-  * @dev Integer division of two numbers truncating the quotient, reverts on division by zero.
-  */
-  function div(uint256 a, uint256 b) internal pure returns (uint256) {
-    require(b > 0); // Solidity only automatically asserts when dividing by 0
-    uint256 c = a / b;
-    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-
-    return c;
-  }
-
-  /**
-  * @dev Subtracts two numbers, reverts on overflow (i.e. if subtrahend is greater than minuend).
-  */
-  function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-    require(b <= a);
-    uint256 c = a - b;
-
-    return c;
-  }
-
-  /**
-  * @dev Adds two numbers, reverts on overflow.
-  */
-  function add(uint256 a, uint256 b) internal pure returns (uint256) {
-    uint256 c = a + b;
-    require(c >= a);
-
-    return c;
-  }
-
-  /**
-  * @dev Divides two numbers and returns the remainder (unsigned integer modulo),
-  * reverts when dividing by zero.
-  */
-  function mod(uint256 a, uint256 b) internal pure returns (uint256) {
-    require(b != 0);
-    return a % b;
-  }
-}
-
+import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
+import 'openzeppelin-solidity/contracts/math/Math.sol';
 
 contract TruthStaking {
 
@@ -79,9 +17,11 @@ contract TruthStaking {
 	struct Statement {
 		uint id;
 		string statement;
+		uint stakeDuration;
 		uint stakeEndTime;
 		address marketMaker;
 		uint numStakes;
+		uint value;
 		bool stakeEnded;
 		string source;
 		mapping(uint => Stake) stakes; // TODO: Make private?
@@ -127,6 +67,14 @@ contract TruthStaking {
 	uint public absEthStaked;
 
 	// Logistics
+	uint pctTimeRemainingThreshold;
+
+	uint minTimeAddPct;
+	uint maxTimeAddPct;
+
+	uint minPotPctThreshold;
+	uint maxPotPctThreshold;
+
 	address private owner;
 	uint public serviceFeeTenThousandths; // This is a 4 digit int to accomodate precision of ten-thosaundths. eg. 1.25% is represented as 125
 
@@ -134,9 +82,8 @@ contract TruthStaking {
 
     // Events that will be emitted on changes.
     event NewStake(uint statementID, uint amount);
-    event StakeEnded(uint statementID, uint finalPot);
+    event StakeEnded(uint statementID, uint finalPot, uint winningPosition);
     event CurrentPot(uint statementID, uint potBalance);
-    event MajorityStaked(uint statementID, uint position);
    	event NewStatement(uint statementID, string statement, uint stakeEndTime);
 
    	// Events for debugging
@@ -151,6 +98,13 @@ contract TruthStaking {
 	// Constructor executes once when contract is created
 	constructor () public {
 		owner = msg.sender;
+		pctTimeRemainingThreshold = 20;
+
+		maxTimeAddPct = 40;
+		minTimeAddPct = 0;
+
+		minPotPctThreshold = 20;
+		maxPotPctThreshold = 180;
 	}
 
 	////////////////////// MODIFIERS //////////////////////
@@ -164,14 +118,14 @@ contract TruthStaking {
 
 	////////////////////// FUNCTIONS //////////////////////
 
-	function newStatement(string _statement, uint _stakingTime, string _source) public returns(uint statementID) {
+	function newStatement(string _statement, uint _stakeDuration, string _source) public returns(uint statementID) {
 		require(bytes(_statement).length > 0, "requires bytes(statement) > 0. Possibly empty string given.");
 
 		uint stakeEndTime;
 
-		stakeEndTime = now + _stakingTime;
+		stakeEndTime = now + _stakeDuration;
 		statementID = absNumStatements++; //sets statementID and THEN increases absNumStatements by 1
-		statements[statementID] = Statement(statementID, _statement, stakeEndTime, msg.sender, 0, false, _source);
+		statements[statementID] = Statement(statementID, _statement, _stakeDuration, stakeEndTime, msg.sender, 0, 0, false, _source);
 		pots[statementID] = Pot(0, 0, 0);
 
 		emit NewStatement(statementID, _statement, stakeEndTime);
@@ -192,6 +146,26 @@ contract TruthStaking {
 
 		// Map Stake with statement AND THEN add one to numStakes
 		s.stakes[s.numStakes++] = Stake({addr:msg.sender, amount:msg.value, position:_position});
+
+		// If it is near the end of the stake and someone stakes a large amount, time is added.
+		uint pctTimeRemaining = 100 * (s.stakeEndTime - now) / (s.stakeEndTime - s.stakeDuration);
+		uint percentOfCurrentPot = 100 * msg.value / s.value;
+
+		if (pctTimeRemaining <= pctTimeRemainingThreshold && percentOfCurrentPot >= minPotPctThreshold) {
+
+			// extraTime = stakeDuration * size of stake * time added per stake size ratio
+			uint extraTime = s.stakeDuration * (percentOfCurrentPot - minPotPctThreshold) * (maxTimeAddPct - minTimeAddPct) / (maxPotPctThreshold - minPotPctThreshold) / 100;
+
+			// Cap the amount of extra time added.
+			extraTime = Math.min(extraTime, s.stakeDuration * maxPotPctThreshold / 100);
+
+			// Add time to the stake
+			s.stakeEndTime += extraTime;
+
+		}
+
+		// Update Statement value
+		s.value += msg.value;
 
 		// Add the stake to total pot
 		emit NewStake(_statementID, msg.value);
@@ -247,12 +221,10 @@ contract TruthStaking {
 		uint winningPot;
 		uint losingPot;
 		uint winningPosition;
-		uint potRemaining; // CHECK math and rounding here
-
 
 		// TODO storage or memory?
 		Statement storage s = statements[_statementID];
-		Pot memory p = pots[_statementID];
+		Pot storage p = pots[_statementID];
 		emit CurrentPot(_statementID, p.total);
 
 
@@ -267,30 +239,22 @@ contract TruthStaking {
 			winningPosition = 0;
 		}
 
+
+		// Platform Service Fee
+		uint fee = losingPot * serviceFeeTenThousandths / 10000;
+		uint potRemaining = losingPot - fee;
+
 		// Emit the total pot value and winning position at end of stake
-		emit StakeEnded(_statementID, p.total);
-		emit MajorityStaked(_statementID, winningPosition);
-
-		// Platform service fee
-		///////////////////////// TODO: MATH AND ROUNDING ISSUE HERE IF FEE < ~10000 or something
-		uint fee;
-		fee = losingPot * serviceFeeTenThousandths / 10000;
-		losingPot -= fee;
-
+		emit StakeEnded(_statementID, winningPot + losingPot, winningPosition);
+		
 		// Beneficiaries 
-		uint arrayLength = beneficiaryAddresses.length;
-
-		for (uint i = 0; i < arrayLength; i++) {
+		for (uint i = 0; i < beneficiaryAddresses.length; i++) {
 			address beneficiary = beneficiaryAddresses[i];
-			uint cut;
-			cut = losingPot * beneficiaryShares[beneficiary] / 10000;
-			losingPot -= cut;
-			beneficiary.transfer(cut);
-
+			beneficiary.transfer(losingPot * beneficiaryShares[beneficiary] / 10000);
+			potRemaining -= losingPot * beneficiaryShares[beneficiary] / 10000;
 		}
 
 		// Stakers Rewards
-		uint stakersPot = losingPot;
 
 		for (uint j = 0; j < s.numStakes; j++) {
 
@@ -301,13 +265,12 @@ contract TruthStaking {
 			if (s.stakes[j].position == winningPosition) {
 
 				// Calculate profit for correct staker
-				profit = s.stakes[j].amount * stakersPot / winningPot;
+				profit = s.stakes[j].amount * potRemaining / winningPot;
 				emit ProfitCheck(profit);
 
 				// Their reward is original stake + profit
 				reward = s.stakes[j].amount + profit;
 				emit RewardCheck(reward);
-				losingPot -= reward;
 
 				// Send the winner their reward
 				s.stakes[j].addr.transfer(reward);
@@ -316,10 +279,16 @@ contract TruthStaking {
 
 		}
 
-		/////// TODO: CHECK fee == losingPot HERE
-		owner.transfer(losingPot);
+		owner.transfer(fee);
 
 	}
+
+	// function addTimeToStake(uint _statementID, uint _percentOfCurrentPot) {
+	// 	require(percentOfCurrentPot >= minPotPctThreshold, 'Stake is not sufficiently large to add time.')
+
+	// 	extraTime = stakeTime * (_percentOfCurrentPot - minPotPctThreshold) * timeSlopeRise / timeSlopeRun
+
+	// }
 
 	function setServiceFeeTenThousandths(uint _newServiceFeeTenThousandths) public onlyOwner {
 		// _newServiceFeeTenThousandths should be desired fee percentage * 100.

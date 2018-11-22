@@ -3,7 +3,7 @@
 // // Winnings are distributed automatically as determined by majority stake at the end of staking round.
 // // ***** WORK IN PROGRESS *****
 
-// pragma solidity ^0.4.2;
+pragma solidity ^0.4.2;
 
 // import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 
