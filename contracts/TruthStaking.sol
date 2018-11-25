@@ -76,7 +76,7 @@ contract TruthStaking {
 	uint maxPotPctThreshold;
 
 	address private owner;
-	uint public serviceFeeTenThousandths; // This is a 4 digit int to accomodate precision of ten-thosaundths. eg. 1.25% is represented as 125
+	uint public serviceFeeTenThousandths; // int range [0, 10000] to accomodate precision of ten-thosaundths. eg. 1.25% is represented as 125
 
 	////////////////////// EVENTS //////////////////////
 
@@ -84,7 +84,7 @@ contract TruthStaking {
     event NewStake(uint statementID, uint amount);
     event StakeEnded(uint statementID, uint finalPot, uint winningPosition);
     event CurrentPot(uint statementID, uint potBalance);
-   	event NewStatement(uint statementID, string statement, uint stakeEndTime);
+   	event NewStatement(uint statementID, string statement, uint stakeEndTime, string source);
 
    	// Events for debugging
    	event CorrectStake(uint statementID, address stakerAddr, uint amount, uint stakedPosition);
@@ -118,22 +118,25 @@ contract TruthStaking {
 
 	////////////////////// FUNCTIONS //////////////////////
 
-	function newStatement(string _statement, uint _stakeDuration, string _source) public returns(uint statementID) {
+	function newStatement(string _statement, uint _position, uint _stakeDuration, string _source) public payable returns(uint statementID) {
+		// creates a new statement with an initial stake
+
 		require(bytes(_statement).length > 0, "requires bytes(statement) > 0. Possibly empty string given.");
+		require(msg.value > 0, "Insufficient stake value.");
+		require(_position == 0 || _position == 1, "Invalid position to stake on."); 
+		require(_stakeDuration > 60, "Stake duration must be at least 60 seconds.");
 
-		uint stakeEndTime;
+		uint stakeEndTime = now + _stakeDuration;
 
-		stakeEndTime = now + _stakeDuration;
 		statementID = absNumStatements++; //sets statementID and THEN increases absNumStatements by 1
 		statements[statementID] = Statement(statementID, _statement, _stakeDuration, stakeEndTime, msg.sender, 0, 0, false, _source);
-		pots[statementID] = Pot(0, 0, 0);
 
-		emit NewStatement(statementID, _statement, stakeEndTime);
+		emit NewStatement(statementID, _statement, stakeEndTime, _source);
+
+		stake(statementID, _position);
+
 	}
 
-
-	///// TODO KRIS: stake() is failing when called. exception thrown in contract code
-	// try ganache client to test it without the if loop for time remaining addition.
 
 	function stake(uint _statementID, uint _position) public payable { // returns( ) necessary? 
 
@@ -146,26 +149,33 @@ contract TruthStaking {
 		require(_statementID < absNumStatements && _statementID >= 0, "Invalid Statement ID.");
 
 		Statement storage s = statements[_statementID];
+
+		//////////TODO : THE use of now can be gamed by miners
 		require(now <= s.stakeEndTime, "Stake already ended for this statement.");
 
 		// Map Stake with statement AND THEN add one to numStakes
 		s.stakes[s.numStakes++] = Stake({addr:msg.sender, amount:msg.value, position:_position});
 
 		// If it is near the end of the stake and someone stakes a large amount, time is added.
-		uint pctTimeRemaining = 100 * (s.stakeEndTime - now) / (s.stakeEndTime - s.stakeDuration);
-		uint percentOfCurrentPot = 100 * msg.value / s.value;
+		uint pctTimeRemaining = 100 * (s.stakeEndTime - now) / (s.stakeDuration);
 
-		if (pctTimeRemaining <= pctTimeRemainingThreshold && percentOfCurrentPot >= minPotPctThreshold) {
+		if (pctTimeRemaining <= pctTimeRemainingThreshold) {
 
-			// extraTime = stakeDuration * size of stake * time added per stake size ratio
-			uint extraTime = s.stakeDuration * (percentOfCurrentPot - minPotPctThreshold) * (maxTimeAddPct - minTimeAddPct) / (maxPotPctThreshold - minPotPctThreshold) / 100;
+		    assert(s.value > 0);
+		    uint percentOfCurrentPot = 100 * msg.value / s.value;
+		    
+		    if(percentOfCurrentPot >= minPotPctThreshold) {
+		        
+    			// extraTime = stakeDuration * size of stake * time added per stake size ratio
+    			uint extraTime = s.stakeDuration * (percentOfCurrentPot - minPotPctThreshold) * (maxTimeAddPct - minTimeAddPct) / (maxPotPctThreshold - minPotPctThreshold) / 100;
+    
+    			// Cap the amount of extra time added.
+    			extraTime = Math.min(extraTime, s.stakeDuration * maxPotPctThreshold / 100);
+    
+    			// Add time to the stake
+    			s.stakeEndTime += extraTime;
 
-			// Cap the amount of extra time added.
-			extraTime = Math.min(extraTime, s.stakeDuration * maxPotPctThreshold / 100);
-
-			// Add time to the stake
-			s.stakeEndTime += extraTime;
-
+		    }
 		}
 
 		// Update Statement value
@@ -209,7 +219,7 @@ contract TruthStaking {
 		require(!s.stakeEnded, "endStake has already been called.");
 
 		// 2. Effects
-		s.stakeEnded = true;  //////// TODO: HAS NO EFFECT (update: switched to storage, works now?)
+		s.stakeEnded = true; 
 
 		// 3. Interactions
 		// distribute pot between winners, proportional to their stake
@@ -260,6 +270,8 @@ contract TruthStaking {
 
 		// Stakers Rewards
 
+		//TODO: Reward marketMaker x2
+
 		for (uint j = 0; j < s.numStakes; j++) {
 
 			// emit LoopCheck(j);
@@ -287,12 +299,7 @@ contract TruthStaking {
 
 	}
 
-	// function addTimeToStake(uint _statementID, uint _percentOfCurrentPot) {
-	// 	require(percentOfCurrentPot >= minPotPctThreshold, 'Stake is not sufficiently large to add time.')
 
-	// 	extraTime = stakeTime * (_percentOfCurrentPot - minPotPctThreshold) * timeSlopeRise / timeSlopeRun
-
-	// }
 
 	function setServiceFeeTenThousandths(uint _newServiceFeeTenThousandths) public onlyOwner {
 		// _newServiceFeeTenThousandths should be desired fee percentage * 100.
@@ -313,9 +320,10 @@ contract TruthStaking {
 		// TODO: Test you can set address cut back to zero
 	}
 
+	function setAddTimeParameters() {}
+
 	function transferOwnership(address _newOwner) public onlyOwner {
 		owner = _newOwner;
 	}
-
 
 }
