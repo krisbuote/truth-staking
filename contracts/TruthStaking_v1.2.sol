@@ -298,7 +298,7 @@ contract TruthStaking {
 		serviceFeeTenThousandths = _newServiceFeeTenThousandths;
 	}
 
-	function addBeneficiaryCutTenThousandths(address _beneficiaryAddress, uint _potProportionTenThousandths) public onlyOwner {
+	function setBeneficiaryCutTenThousandths(address _beneficiaryAddress, uint _potProportionTenThousandths) public onlyOwner {
 		// _potProportionTenThousandths should be desired percentage * 100.
 		// e.g. if a pot cut of 0.35% is desired, _potProportionTenThousandths = 35
 		require(_potProportionTenThousandths >= 0, 'Beneficiary cut cannot be less than 0%.');
