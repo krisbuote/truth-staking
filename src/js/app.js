@@ -175,9 +175,9 @@ App = {
 
 										                <div id="collapse${statementID}" class="collapse" aria-labelledby="heading${statementID}" data-parent="#accordion">
 										                  <div class="card-body">
-										                    Put data form in here (with Netlify?). Info can be shown: <br>
-										                    statement source: ${statementSource} <br>
-										                    status: [in future: put green 'Active', yellow 'Ending soon!', red/orange 'Finished'] </br>
+										                    Put data form in here (with Netlify?). Info can be shown: <br/>
+										                    statement source: ${statementSource} <br/>
+										                    status: [in future: put green 'Active', yellow 'Ending soon!', red/orange 'Finished'] <br/>
 										                    stake end time: ${stakeEndTime}
 
 										                  </div>
@@ -211,13 +211,14 @@ App = {
 	makeNewStatement: function() {
 		var newStatementString = $("#newStatementString").val();
 		var newStatementStakingPeriod = $("#newStatementStakingPeriod").val();
+		var newStatementSource = $("#newStatementSource").val();
 
 		var txObject = {
 			from: App.account
 		}
 
 		var contractInstance = App.truthStakingContract.at(contractAddress);
-		contractInstance.newStatement(newStatementString, newStatementStakingPeriod, txObject, function(err, result) {
+		contractInstance.newStatement(newStatementString, newStatementStakingPeriod, newStatementSource, txObject, function(err, result) {
 			if(!err) {
 				console.log("makeNewStatement success! new statementID: ", result)
 			}

@@ -131,6 +131,10 @@ contract TruthStaking {
 		emit NewStatement(statementID, _statement, stakeEndTime);
 	}
 
+
+	///// TODO KRIS: stake() is failing when called. exception thrown in contract code
+	// try ganache client to test it without the if loop for time remaining addition.
+
 	function stake(uint _statementID, uint _position) public payable { // returns( ) necessary? 
 
 	    // Revert the call if the staking period is over or if insufficient value transacted
