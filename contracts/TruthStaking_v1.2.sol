@@ -100,8 +100,8 @@ contract TruthStaking {
 		owner = msg.sender;
 		pctTimeRemainingThreshold = 20;
 
-		maxTimeAddPct = 40;
 		minTimeAddPct = 0;
+		maxTimeAddPct = 40;
 
 		minPotPctThreshold = 20;
 		maxPotPctThreshold = 180;
