@@ -156,6 +156,10 @@ contract TruthStaking {
 		// Map Stake with statement AND THEN add one to numStakes
 		s.stakes[s.numStakes++] = Stake({addr:msg.sender, amount:msg.value, position:_position});
 
+
+
+		///// KRIS. it doesn't appear this has an effect on stakeEndTime ?
+
 		// If it is near the end of the stake and someone stakes a large amount, time is added.
 		uint pctTimeRemaining = 100 * (s.stakeEndTime - now) / (s.stakeDuration);
 

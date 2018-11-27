@@ -129,10 +129,16 @@
                 <label for="newStatementString">Enter new statement: </label>
                 <input type="text" id="newStatementString" placeholder="This sentence is false."/>
                 <br/>
+                <div class="form-group">
+                  <label for="newStatementPosition">Select Position</label>
+                  <select class="form-control" id="newStatementPosition"></select>
+                </div>
                 <label for="newStatementStakingPeriod">Set staking period (seconds): </label>
                 <input type="number" id="newStatementStakingPeriod" placeholder="3600"/> <br/>
                 <label for="newStatementSource">Statement source: </label> 
                 <input type="text" id="newStatementSource" placeholder="www.newyorktimes.com"/>
+                <label for="newStatementStakeValue">First Stake: </label>
+                <input type="number" id="newStatementStakeValue" placeholder="1.000 ether" step="0.000000000000000001"/>
                 <button type="submit" class="btn btn-primary">Create</button>
               </form>
             </div>
