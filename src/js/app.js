@@ -114,22 +114,12 @@ App = {
 		contractInstance.absEthStaked(function(error, absEthStaked) {
 		   if(!error) {
 		   		console.log('absEth', absEthStaked);
-      			$("#absEthStaked").html(absEthStaked.toNumber()/10**18);
+      			$("#absEthStaked").html((absEthStaked.toNumber()/10**18).toFixed(3));
 			}
 		   else {
 		        console.error(error);
 			}
 		});
-
-
-
-		 // Stake Position select menu
-	    var positionSelect = $("#positionSelect");
-	    positionSelect.empty();
-	    var chooseTrue = "<option value='1'> True </ option>"
-	    var chooseFalse = "<option value='0'> False </ option>"
-	    positionSelect.append(chooseTrue);
-	    positionSelect.append(chooseFalse);
 
 
 	    // New Statement Position select menu
@@ -139,43 +129,6 @@ App = {
 	    var chooseFalse = "<option value='0'> False </ option>"
 	    newStatmentPositionSelect.append(chooseTrue);
 	    newStatmentPositionSelect.append(chooseFalse);
-
-
-		// Build the Statement display table
-		contractInstance.absNumStatements(function(error, numStatements){
-
-		    if(!error) {
-		        console.log('numStatements:', numStatements);
-
-
-		        var statementInfo = $("#statementInfo");
-				statementInfo.empty();
-
-				// table builder 
-				for (var i = 0; i < numStatements; i++) {
-
-				contractInstance.statements(i, function(error, statement) {
-				  var statementID = statement[0];
-				  var text = statement[1];
-				  var stakeEndTime = statement[2];
-				  var marketMaker = statement[3];
-				  var numStakes = statement[4];
-				  var stakeEnded = statement[5];
-				  var stakedEth;
-
-				  var statementTemplate = `<tr><td> ${statementID} </td><td> ${numStakes} </td><td> ${text} </td><td> ${stakeEnded} </td></tr>`
-
-				  statementInfo.append(statementTemplate);
-				});
-
-
-				}
-		    }
-
-		    else {
-		        console.error(error);
-		    }
-		});
 
 
 		// Build collapsible accordion to display statements and eth staked on face, click to show more data.
@@ -199,40 +152,80 @@ App = {
 					var stakeEndTime = statement[3];
 					var marketMaker = statement[4];
 				 	var numStakes = statement[5];
-					var ethStaked = statement[6] / 10**18;
+					var ethStaked = (statement[6] / 10**18).toFixed(3);
 					var stakeEnded = statement[7];
 					var statementSource = statement[8];
 
+					// var stakeActiveClass = active || ending_soon || finished //inject into html class. style with custom css
 
-					var statementAccordionTemplate =`<div class="card">
-										                <div class="card-header" id="cardHeading${statementID}">
-										                  <h5 class="mb-0">
-										                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
-										                      ${ethStaked} ether on "${statementText}"
+
+					var statementAccordionTemplate =`<div class="card bg-transparent mb-3" id="card${statementID}">
+
+										                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
+										                    <button class="btn btn-default" >
+										                      <h3 class="font-weight-light"><u>   ${ethStaked} eth   </u></h3>
+										                      <p class="lead font-weight-light">${statementText}</p>
 										                    </button>
-										                  </h5>
 										                </div>
 
-										                <div id="collapse${statementID}" class="card-body collapse" aria-labelledby="heading${statementID}" data-parent="#accordion">
-										                  <div class="card-body">
-										                    Put data form in here (with Netlify?). Info can be shown: <br/>
-										                    statement source: ${statementSource} <br/>
-										                    status: [in future: put green 'Active', yellow 'Ending soon!', red/orange 'Finished'] <br/>
-										                    stake end time: ${stakeEndTime}
 
-										                  </div>
+
+										                <div class="card-body collapse" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}" data-parent="#accordion">
+
+											                <div class="card-body text-center">
+
+											                  	<form method="POST" onSubmit="App.makeStake(${statementID}, stakePosition${statementID}, stakeValue${statementID}); return false;">
+
+
+												                    <div class="stake-collapse" data-toggle="collapse" data-target="#card${statementID}Stake">
+													                    <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
+																		    <label button class="btn btn-dark">
+																		    	<input type="radio" id="trueButton${statementID}" value="1" name="stakePosition${statementID}">True
+																		    </label>
+																		    <label button class="btn btn-dark">
+																		    	<input type="radio" id="falseButton${statementID}" value="0" name="stakePosition${statementID}">False
+																		    </label>
+																		</div>
+																	</div>
+
+																	</br>
+
+																	<div class="collapse text-center" id="card${statementID}Stake">
+																		<div class="input-group">
+																		    <div class="input-group-prepend">
+																		    	<span class="input-group-text text-monospace" for="stakeValue${statementID}">Stake Amount:</span>
+																		    </div>
+																		  	<input type="number" id="stakeValue${statementID}" name="stakeValue${statementID}" placeholder="1.000 ether" step="0.000000000000000001"/>
+																		  	<div class="input-group-append">
+																		    	<span class="input-group-text text-monospace">eth</span>
+																		  	</div>
+																		</div> <br/>
+																		<button type="submit" class="btn btn-primary">Stake</button>
+														                <hr/>
+																	</div>
+													            </form>
+
+
+
+											                  
+											                    <div class="statement-source text-center">
+											                    	source: ${statementSource}
+											                    </div>
+
+											                    <div>
+											                    	<button type="button" class="btn btn-link btn-lg float-right">
+																	  <a href="./about.html" class="fas fa-info-circle"></a>
+																	</button>
+																</div>
+
+
+											                  </div>
+
+
 										                </div>
 										            </div>`
 
 					statementAccordionData.append(statementAccordionTemplate);
-
-
-
-
-					// var thisStatement = new App.statementData(statement[0].toNumber(), statement[1].toString());
-	
-					// App.statementArray.push(statement);
-					// console.log(App.statementArray);
 
 
 				});
@@ -303,15 +296,31 @@ App = {
 
 	},
 
-	makeStake: function() {
-	    var statementIdToStake = $("#statementIdToStake").val()
-	    var position = $("#positionSelect").val();
-	    var stakeValue = $("#stakeValue").val();
-	    console.log(statementIdToStake, position, stakeValue);
+	makeStake: function(_statementID, _stakePosition, _stakeValue) {
+	    // var statementIdToStake = $("#statementIdToStake").val()
+	    var statementIdToStake = _statementID;
+	    console.log('sid', statementIdToStake);
+	    var stakePosition = _stakePosition.value;
+	    console.log('stake pos', stakePosition);
 
-	    if (!statementIdToStake || !position || !stakeValue) {
-			console.log("Please complete the form.");
-			alert("You must complete the form first.");
+	    // positionTrue = $("#trueButton" + statementIdToStake.toString()).val();
+	    // positionFalse = $("#falseButton" + statementIdToStake.toString()).val();
+	    // console.log('true val:', positionTrue);
+	    // console.log('false val:', positionFalse)
+	    // var position = $("#positionSelect").val();
+	    // var stakeValue = $("#stakeValue").val();
+
+	    var stakeValue = _stakeValue.value;
+	    console.log('stakeValue: ', stakeValue)
+	    // console.log(statementIdToStake, stakePosition, stakeValue);
+
+
+	    if (!stakeValue) {
+			alert("Please set the stake amount.");
+	    }
+	    console.log(App.account);
+	    if (!App.account) {
+	    	alert("Please sign into MetaMask.");
 	    }
 
 	    else {
@@ -321,7 +330,7 @@ App = {
 			}
 
 			var contractInstance = App.truthStakingContract.at(contractAddress);
-		    contractInstance.stake.sendTransaction(statementIdToStake, position, txObject, function(error, result) {
+		    contractInstance.stake.sendTransaction(statementIdToStake, stakePosition, txObject, function(error, result) {
 		    	if(!error) {
 		    		console.log(result);
 		    		alert("Successful stake! It will take some time to appear on the blockchain.");
@@ -333,7 +342,7 @@ App = {
 		    		alert("Transaction failed. Please check if the staking period is over.")
 		    		console.error(error);
 
-		    		// TODO: Include transaction error explanations: stake over, not enough ether sent, invalid statementId, invalid position
+		    		// TODO: Include transaction error explanations: stake over, not enough ether sent, invalid statementId, invalid stakePosition
 		    	}
 
 		    });
@@ -355,6 +364,17 @@ function wait(ms){
      end = new Date().getTime();
   }
 }
+
+// Keep card stake collapse open
+$('.card').click(function(e) {
+  if (
+    $(this)
+      .find('.collapse')
+      .hasClass('show')
+  ) {
+    e.stopPropagation();
+  }
+});
 
 $(function() {
   $(window).load(function() {
