@@ -159,12 +159,12 @@ App = {
 					// var stakeActiveClass = active || ending_soon || finished //inject into html class. style with custom css
 
 
-					var statementAccordionTemplate =`<div class="card bg-transparent mb-3" id="card${statementID}">
+					var statementAccordionTemplate =`<div class="card bg-transparent border-light mb-3" id="card${statementID}">
 
 										                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
 										                    <button class="btn btn-default" >
 										                      <h3 class="font-weight-light"><u>   ${ethStaked} eth   </u></h3>
-										                      <p class="lead font-weight-light">${statementText}</p>
+										                      <p class="font-weight-light">${statementText}</p>
 										                    </button>
 										                </div>
 
@@ -209,11 +209,11 @@ App = {
 
 											                  
 											                    <div class="statement-source text-center">
-											                    	source: ${statementSource}
+											                    	<small class="text-muted">source: ${statementSource}</small>
 											                    </div>
 
 											                    <div>
-											                    	<button type="button" class="btn btn-link btn-lg float-right">
+											                    	<button type="button" class="btn btn-link btn-lg mt-0 float-right">
 																	  <a href="./about.html" class="fas fa-info-circle"></a>
 																	</button>
 																</div>
