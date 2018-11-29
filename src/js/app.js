@@ -179,7 +179,7 @@ App = {
 
 												                    <div class="stake-collapse" data-toggle="collapse" data-target="#card${statementID}Stake">
 													                    <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
-																		    <label button class="btn btn-dark">
+																		    <label button class="btn btn-light">
 																		    	<input type="radio" id="trueButton${statementID}" value="1" name="stakePosition${statementID}">True
 																		    </label>
 																		    <label button class="btn btn-dark">
