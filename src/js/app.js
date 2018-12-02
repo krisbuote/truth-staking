@@ -365,19 +365,19 @@ function wait(ms){
   }
 }
 
-// Keep card stake collapse open
-$('.card').click(function(e) {
-  if (
-    $(this)
-      .find('.collapse')
-      .hasClass('show')
-  ) {
-    e.stopPropagation();
-  }
-});
+// // Keep card stake collapse open
+// $('.card').click(function(e) {
+//   if (
+//     $(this)
+//       .find('.collapse')
+//       .hasClass('show')
+//   ) {
+//     e.stopPropagation();
+//   }
+// });
 
 $(function() {
-  $(window).load(function() {
+  $(window).on("load", function() {
     App.init();
   });
 });
