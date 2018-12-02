@@ -140,7 +140,7 @@ App = {
 				var statementAccordionData = $('#statementAccordionData');
 				statementAccordionData.empty();
 
-				statementArray = [];
+				var allStatementsArray = [];
 
 				// Looped accordion builder
 				for (var i = 0; i < numStatements; i++) {
@@ -159,23 +159,16 @@ App = {
 
 					// var stakeActiveClass = active || ending_soon || finished //inject into html class. style with custom css
 
-					if (statementID % 2 == 0) {
-						var trClass = "even";
-					}
-					else {
-						var trClass = "odd";
-					}
 
-
-					var statementAccordionTemplate =`<tr role=row class=${trClass}>
-														<td class="sorting_1">${ethStaked}</td>
-														<td class>${statementText}</td>
+					var statementAccordionTemplate =`<tr>
 											        </tr>`
 
 					statementAccordionData.append(statementAccordionTemplate);
 
+
+
 					statementData = [statementID.toString(), statementText.toString()];
-					statementArray[statementArray.length] = statementData;
+					allStatementsArray[allStatementsArray.length] = statementData;
 
 
 
@@ -200,25 +193,25 @@ App = {
 				    [ "Colleen Hurst", "Javascript Developer", "San Francisco", "2360", "2009/09/15", "$205,500" ],
 				    [ "Sonya Frost", "Software Engineer", "Edinburgh", "1667", "2008/12/13", "$103,600" ]]
 
-				console.log(statementArray);
+				console.log(dataSet);
+
+				console.log(allStatementsArray);
+
+
 
 				// $('#cardTable').DataTable( {
-			 //        data: statementArray,
+			 //        data: allStatementsArray,
 			 //        columns: [
 			 //            { title: "id" },
 			 //            { title: "text" }
 			 //        ]
 			 //    });
 
-			     $('#example').DataTable( {
-				        data: dataSet,
+			     $('#statementTable').DataTable( {
+				        data: allStatementsArray,
 				        columns: [
-				            { title: "Name" },
-				            { title: "Position" },
-				            { title: "Office" },
-				            { title: "Extn." },
-				            { title: "Start date" },
-				            { title: "Salary" }
+				            { title: "id" },
+				            { title: "text" }
 				        ]
 				    } );
 
@@ -372,9 +365,9 @@ $(function() {
 });
 
 // $(document).ready(function() {
-// 	console.log(statementArray);
+// 	console.log(allStatementsArray);
 //     $('#cardTable').DataTable( {
-//         data: statementArray,
+//         data: allStatementsArray,
 //         columns: [
 //             { title: "id" },
 //             { title: "text" }
