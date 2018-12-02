@@ -16,7 +16,7 @@ App = {
 	web3Provider: null,
 	contracts: {},
   	truthStakingContract: null,
-  	statementArray: [],
+  	allStatementsArray: [],
   	account: '0x0',
 
 	init: function() {
@@ -130,113 +130,230 @@ App = {
 	    newStatmentPositionSelect.append(chooseFalse);
 
 
-		// Build collapsible accordion to display statements and eth staked on face, click to show more data.
 		var start = new Date().getTime();
 
-		contractInstance.absNumStatements(function(error, numStatements){ 
+		// Build data table out of live statements
+		contractInstance.absNumStatements(function(error, _numStatements){ 
 
 			if(!error) {
+				var numStatements = _numStatements.toNumber();
 
-				var statementAccordionData = $('#statementAccordionData');
-				statementAccordionData.empty();
-
+				App.allStatementsArray = [];
 				var allStatementsArray = [];
+				console.log(numStatements);
 
-				// Looped accordion builder
 				for (var i = 0; i < numStatements; i++) {
 
-
-					contractInstance.statements(i, function(error, statement) {
-				  	var statementID = statement[0];
-					var statementText = statement[1];
-					var stakeDuration = statement[2];
-					var stakeEndTime = statement[3];
-					var marketMaker = statement[4];
-				 	var numStakes = statement[5];
-					var ethStaked = (statement[6] / 10**18).toFixed(3);
-					var stakeEnded = statement[7];
-					var statementSource = statement[8];
-
-					// var stakeActiveClass = active || ending_soon || finished //inject into html class. style with custom css
-
-
-					var statementAccordionTemplate =`<tr>
-											        </tr>`
-
-					statementAccordionData.append(statementAccordionTemplate);
-
-
-
-					statementData = [statementID.toString(), statementText.toString()];
-					allStatementsArray[allStatementsArray.length] = statementData;
-
-
-
-				});
+					App.getStatementDataAndBuildTable(i, numStatements);
 
 				}
-
-				// TODO: USE datatables with clickable/expanding rows to show stake form.
-				// Put top 3-5 most popular live stakes on main page, put 3 top most popular finished stakes below that. 
-				// Put buttons below each exposition that take you to complete listing pages.
-				// Total pages: main, about, live stakes, past stakes.
-
-				var dataSet = [
-				    [ "Tiger Nixon", "System Architect", "Edinburgh", "5421", "2011/04/25", "$320,800" ],
-				    [ "Garrett Winters", "Accountant", "Tokyo", "8422", "2011/07/25", "$170,750" ],
-				    [ "Ashton Cox", "Junior Technical Author", "San Francisco", "1562", "2009/01/12", "$86,000" ],
-				    [ "Cedric Kelly", "Senior Javascript Developer", "Edinburgh", "6224", "2012/03/29", "$433,060" ],
-				    [ "Airi Satou", "Accountant", "Tokyo", "5407", "2008/11/28", "$162,700" ],
-				    [ "Brielle Williamson", "Integration Specialist", "New York", "4804", "2012/12/02", "$372,000" ],
-				    [ "Herrod Chandler", "Sales Assistant", "San Francisco", "9608", "2012/08/06", "$137,500" ],
-				    [ "Rhona Davidson", "Integration Specialist", "Tokyo", "6200", "2010/10/14", "$327,900" ],
-				    [ "Colleen Hurst", "Javascript Developer", "San Francisco", "2360", "2009/09/15", "$205,500" ],
-				    [ "Sonya Frost", "Software Engineer", "Edinburgh", "1667", "2008/12/13", "$103,600" ]]
-
-				console.log(dataSet);
-
-				console.log(allStatementsArray);
-
-
-
-				// $('#cardTable').DataTable( {
-			 //        data: allStatementsArray,
-			 //        columns: [
-			 //            { title: "id" },
-			 //            { title: "text" }
-			 //        ]
-			 //    });
-
-			     $('#statementTable').DataTable( {
-				        data: allStatementsArray,
-				        columns: [
-				            { title: "id" },
-				            { title: "text" }
-				        ]
-				    } );
-
-
-				var end = new Date().getTime();
-				var elapsed = end - start;
-				console.log("Statement Data Load Time: " + elapsed);
-				// For 10 statements: 140-240 ms.
-
-
 
 			}
 
 			else {
-		        console.error(error);
-		    }
+				console.error(error)
+			}
 
+
+
+
+
+					// contractInstance.statements(i, function(error, statement) {
+
+					// 	if(!error){
+
+					// 	  	var statementID = statement[0];
+					// 		var statementText = statement[1];
+					// 		var stakeDuration = statement[2];
+					// 		var stakeEndTime = statement[3];
+					// 		var marketMaker = statement[4];
+					// 	 	var numStakes = statement[5];
+					// 		var ethStaked = (statement[6] / 10**18).toFixed(3);
+					// 		var stakeEnded = statement[7];
+					// 		var statementSource = statement[8];
+
+					// 		// var stakeActiveClass = active || ending_soon || finished //inject into html class. style with custom css
+
+
+					// 		var timeRemainingSeconds = stakeEndTime - Date.now()/1000
+
+					// 		// if (timeRemainingSeconds >= 0) {
+					// 		// 	var statementData = [ethStaked, statementText.toString(), timeRemainingSeconds];
+					// 		// 	allStatementsArray.push(statementData);
+
+					// 		// }
+					// 		var statementData = [ethStaked, statementText.toString(), timeRemainingSeconds];
+					// 		allStatementsArray.push(statementData);
+
+					// 		console.log('i', i);
+					// 		console.log('as',allStatementsArray);
+
+					// 		if (allStatementsArray.length == _numStatements){
+					// 			console.log('go');
+					// 			$('#statementTable').DataTable( {
+					// 		        data: allStatementsArray,
+					// 		        columns: [
+					// 		            { title: "eth" },
+					// 		            { title: "statement" },
+					// 		            { title: "time remaining"}
+
+					// 		        ]
+					// 		    });
+
+					// 		}
+					// 	}
+
+					// 	else{console.error(error)}
+
+					// });
+
+		// 		}
+
+		// 	}
+
+		// 	else{console.error(error)}
 		});
 
 
-		// console.log(statementDict);
+
 
 		loader.hide();
       	content.show();
 	
+	},
+
+	
+
+	getStatementDataAndBuildTable: function(_index, _numStatements) {
+		// Queries blockchain for statement data
+		var contractInstance = App.truthStakingContract.at(contractAddress);
+
+		contractInstance.statements(_index, function(error, statement) {
+
+			if(!error){
+				
+				App.allStatementsArray.push(statement); // Push to array
+
+				if (App.allStatementsArray.length == _numStatements) {
+					App.displayLiveDataTable(); // If all statements collected, build data table
+				}
+			}
+
+			else{console.error(error)}
+
+		});
+
+
+	},
+
+	displayLiveDataTable: function() {
+
+		var liveStatementsData = [];
+
+		for (var i = 0; i < App.allStatementsArray.length; i++) {
+
+			var statement = App.allStatementsArray[i];
+
+		  	var statementID = statement[0];
+			var statementText = statement[1];
+			var stakeDuration = statement[2];
+			var stakeEndTime = statement[3];
+			var marketMaker = statement[4];
+		 	var numStakes = statement[5];
+			var ethStaked = (statement[6] / 10**18).toFixed(3);
+			var stakeEnded = statement[7];
+			var statementSource = statement[8];
+
+			var timeRemainingSeconds = Math.floor(stakeEndTime - Date.now()/1000);
+
+			var cardHtml = App.collapsingCardHTMLformat(statementID, statementText, ethStaked, statementSource);
+
+			if (!stakeEnded) {
+				liveStatementsData.push([ethStaked, cardHtml, timeRemainingSeconds]);
+			}
+
+		}
+
+		console.log(liveStatementsData);
+
+		$('#statementTable').DataTable( {
+	        data: liveStatementsData,
+	        columns: [
+	            { title: "eth"},
+	            { title: "statement" },
+	            { title: "time remaining (s)"}
+	        ]
+	    });
+	},
+
+	collapsingCardHTMLformat: function(statementID, statementText, ethStaked, statementSource) {
+		var html = `<div class="card bg-transparent border-light mb-3" id="card${statementID}">
+		                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
+		                    <button class="btn btn-default" >
+		                      <h3 class="font-weight-light"><u>   ${ethStaked} eth   </u></h3>
+		                      <p class="font-weight-light">${statementText}</p>
+		                    </button>
+		                </div>
+
+
+
+		                <div class="card-body collapse" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}" data-parent="#accordion">
+
+			                <div class="card-body text-center">
+
+			                  	<form method="POST" onSubmit="App.makeStake(${statementID}, stakePosition${statementID}, stakeValue${statementID}); return false;">
+
+
+				                    <div class="stake-collapse" data-toggle="collapse" data-target="#card${statementID}Stake">
+					                    <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
+										    <label button class="btn btn-light">
+										    	<input type="radio" id="trueButton${statementID}" value="1" name="stakePosition${statementID}">True
+										    </label>
+										    <label button class="btn btn-dark">
+										    	<input type="radio" id="falseButton${statementID}" value="0" name="stakePosition${statementID}">False
+										    </label>
+										</div>
+									</div>
+
+									</br>
+
+									<div class="collapse text-center" id="card${statementID}Stake">
+										<div class="input-group">
+										    <div class="input-group-prepend">
+										    	<span class="input-group-text text-monospace" for="stakeValue${statementID}">Stake Amount:</span>
+										    </div>
+										  	<input type="number" id="stakeValue${statementID}" name="stakeValue${statementID}" placeholder="1.000 ether" step="0.000000000000000001"/>
+										  	<div class="input-group-append">
+										    	<span class="input-group-text text-monospace">eth</span>
+										  	</div>
+										</div> <br/>
+										<button type="submit" class="btn btn-primary">Stake</button>
+						                <hr/>
+									</div>
+					            </form>
+
+
+
+			                  
+			                    <div class="statement-source text-center">
+			                    	<small class="text-muted">source: ${statementSource}</small>
+			                    </div>
+
+			                    <div>
+			                    	<button type="button" class="btn btn-link btn-lg mt-0 float-right">
+									  <a href="./about.html" class="fas fa-info-circle"></a>
+									</button>
+								</div>
+
+
+			                  </div>
+
+
+		                </div>
+		            </div>`
+
+		return html
+
 	},
 
 
@@ -300,7 +417,7 @@ App = {
 	    }
 	    console.log(App.account);
 	    if (!App.account) {
-	    	alert("Please sign into MetaMask.");
+	    	alert("Please sign into MetaMask and refresh.");
 	    }
 
 	    else {
@@ -366,12 +483,15 @@ $(function() {
 
 // $(document).ready(function() {
 // 	console.log(allStatementsArray);
-//     $('#cardTable').DataTable( {
-//         data: allStatementsArray,
-//         columns: [
-//             { title: "id" },
-//             { title: "text" }
-//         ]
-//     });
+//     $('#statementTable').DataTable( {
+// 	        data: allStatementsArray,
+// 	        columns: [
+// 	            { title: "eth" },
+// 	            { title: "statement" },
+// 	            { title: "time remaining"}
+
+// 	        ]
+// 	    });
+
 // });
 
