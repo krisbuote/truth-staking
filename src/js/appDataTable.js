@@ -144,7 +144,7 @@ App = {
 
 				for (var i = 0; i < numStatements; i++) {
 
-					App.getStatementDataAndBuildTable(i, numStatements);
+					App.getStatementDataAndBuildTable(i, numStatements, contractInstance);
 
 				}
 
@@ -154,67 +154,7 @@ App = {
 				console.error(error)
 			}
 
-
-
-
-
-					// contractInstance.statements(i, function(error, statement) {
-
-					// 	if(!error){
-
-					// 	  	var statementID = statement[0];
-					// 		var statementText = statement[1];
-					// 		var stakeDuration = statement[2];
-					// 		var stakeEndTime = statement[3];
-					// 		var marketMaker = statement[4];
-					// 	 	var numStakes = statement[5];
-					// 		var ethStaked = (statement[6] / 10**18).toFixed(3);
-					// 		var stakeEnded = statement[7];
-					// 		var statementSource = statement[8];
-
-					// 		// var stakeActiveClass = active || ending_soon || finished //inject into html class. style with custom css
-
-
-					// 		var timeRemainingSeconds = stakeEndTime - Date.now()/1000
-
-					// 		// if (timeRemainingSeconds >= 0) {
-					// 		// 	var statementData = [ethStaked, statementText.toString(), timeRemainingSeconds];
-					// 		// 	allStatementsArray.push(statementData);
-
-					// 		// }
-					// 		var statementData = [ethStaked, statementText.toString(), timeRemainingSeconds];
-					// 		allStatementsArray.push(statementData);
-
-					// 		console.log('i', i);
-					// 		console.log('as',allStatementsArray);
-
-					// 		if (allStatementsArray.length == _numStatements){
-					// 			console.log('go');
-					// 			$('#statementTable').DataTable( {
-					// 		        data: allStatementsArray,
-					// 		        columns: [
-					// 		            { title: "eth" },
-					// 		            { title: "statement" },
-					// 		            { title: "time remaining"}
-
-					// 		        ]
-					// 		    });
-
-					// 		}
-					// 	}
-
-					// 	else{console.error(error)}
-
-					// });
-
-		// 		}
-
-		// 	}
-
-		// 	else{console.error(error)}
 		});
-
-
 
 
 		loader.hide();
@@ -224,11 +164,9 @@ App = {
 
 	
 
-	getStatementDataAndBuildTable: function(_index, _numStatements) {
+	getStatementDataAndBuildTable: function(_index, _numStatements, _contractInstance) {
 		// Queries blockchain for statement data
-		var contractInstance = App.truthStakingContract.at(contractAddress);
-
-		contractInstance.statements(_index, function(error, statement) {
+		_contractInstance.statements(_index, function(error, statement) {
 
 			if(!error){
 				
@@ -269,7 +207,7 @@ App = {
 			var cardHtml = App.collapsingCardHTMLformat(statementID, statementText, ethStaked, statementSource);
 
 			if (!stakeEnded) {
-				liveStatementsData.push([ethStaked, cardHtml, timeRemainingSeconds]);
+				liveStatementsData.push([stakeEndTime, cardHtml]);
 			}
 
 		}
@@ -279,78 +217,80 @@ App = {
 		$('#statementTable').DataTable( {
 	        data: liveStatementsData,
 	        columns: [
-	            { title: "eth"},
-	            { title: "statement" },
-	            { title: "time remaining (s)"}
+	            { title: "Recency" },
+	            { title: "Eth"}
 	        ]
 	    });
 	},
 
 	collapsingCardHTMLformat: function(statementID, statementText, ethStaked, statementSource) {
-		var html = `<div class="card bg-transparent border-light mb-3" id="card${statementID}">
-		                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
-		                    <button class="btn btn-default" >
-		                      <h3 class="font-weight-light"><u>   ${ethStaked} eth   </u></h3>
-		                      <p class="font-weight-light">${statementText}</p>
-		                    </button>
-		                </div>
+
+		var html = `<td data-order="${ethStaked}">
+						<div class="card bg-transparent border-light mb-3" id="card${statementID}">
+			                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
+			                    <button class="btn btn-default" >
+			                      <h3 class="font-weight-light"><u>   ${ethStaked} eth   </u></h3>
+			                      <p class="font-weight-light">${statementText}</p>
+			                    </button>
+			                </div>
 
 
 
-		                <div class="card-body collapse" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}" data-parent="#accordion">
+			                <div class="card-body collapse" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}" data-parent="#accordion">
 
-			                <div class="card-body text-center">
+				                <div class="card-body text-center">
 
-			                  	<form method="POST" onSubmit="App.makeStake(${statementID}, stakePosition${statementID}, stakeValue${statementID}); return false;">
+				                  	<form method="POST" onSubmit="App.makeStake(${statementID}, stakePosition${statementID}, stakeValue${statementID}); return false;">
 
 
-				                    <div class="stake-collapse" data-toggle="collapse" data-target="#card${statementID}Stake">
-					                    <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
-										    <label button class="btn btn-light">
-										    	<input type="radio" id="trueButton${statementID}" value="1" name="stakePosition${statementID}">True
-										    </label>
-										    <label button class="btn btn-dark">
-										    	<input type="radio" id="falseButton${statementID}" value="0" name="stakePosition${statementID}">False
-										    </label>
+					                    <div class="stake-collapse" data-toggle="collapse" data-target="#card${statementID}Stake">
+						                    <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
+											    <label button class="btn btn-light">
+											    	<input type="radio" id="trueButton${statementID}" value="1" name="stakePosition${statementID}">True
+											    </label>
+											    <label button class="btn btn-dark">
+											    	<input type="radio" id="falseButton${statementID}" value="0" name="stakePosition${statementID}">False
+											    </label>
+											</div>
 										</div>
+
+										</br>
+
+										<div class="collapse text-center" id="card${statementID}Stake">
+											<div class="input-group">
+											    <div class="input-group-prepend">
+											    	<span class="input-group-text text-monospace" for="stakeValue${statementID}">Stake Amount:</span>
+											    </div>
+											  	<input type="number" id="stakeValue${statementID}" name="stakeValue${statementID}" placeholder="1.000 ether" step="0.000000000000000001"/>
+											  	<div class="input-group-append">
+											    	<span class="input-group-text text-monospace">eth</span>
+											  	</div>
+											</div> <br/>
+											<button type="submit" class="btn btn-primary">Stake</button>
+							                <hr/>
+										</div>
+						            </form>
+
+
+
+				                  
+				                    <div class="statement-source text-center">
+				                    	<small class="text-muted">source: ${statementSource}</small>
+				                    </div>
+
+				                    <div>
+				                    	<button type="button" class="btn btn-link btn-lg mt-0 float-right">
+										  <a href="./about.html" class="fas fa-info-circle"></a>
+										</button>
 									</div>
 
-									</br>
 
-									<div class="collapse text-center" id="card${statementID}Stake">
-										<div class="input-group">
-										    <div class="input-group-prepend">
-										    	<span class="input-group-text text-monospace" for="stakeValue${statementID}">Stake Amount:</span>
-										    </div>
-										  	<input type="number" id="stakeValue${statementID}" name="stakeValue${statementID}" placeholder="1.000 ether" step="0.000000000000000001"/>
-										  	<div class="input-group-append">
-										    	<span class="input-group-text text-monospace">eth</span>
-										  	</div>
-										</div> <br/>
-										<button type="submit" class="btn btn-primary">Stake</button>
-						                <hr/>
-									</div>
-					            </form>
+				                  </div>
 
 
-
-			                  
-			                    <div class="statement-source text-center">
-			                    	<small class="text-muted">source: ${statementSource}</small>
-			                    </div>
-
-			                    <div>
-			                    	<button type="button" class="btn btn-link btn-lg mt-0 float-right">
-									  <a href="./about.html" class="fas fa-info-circle"></a>
-									</button>
-								</div>
-
-
-			                  </div>
-
-
-		                </div>
-		            </div>`
+			                </div>
+			            </div>
+			        </td>`
 
 		return html
 

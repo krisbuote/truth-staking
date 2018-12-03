@@ -18,12 +18,14 @@ contract TruthStaking {
 		uint id;
 		string statement;
 		uint stakeDuration;
+		uint stakeBeginningTime;
 		uint stakeEndTime;
 		address marketMaker;
 		uint numStakes;
-		uint value;
+		uint ethStaked;
 		bool stakeEnded;
 		string source;
+		bool verdict;
 		mapping(uint => Stake) stakes; // TODO: Make private?
 	}
 
@@ -129,7 +131,7 @@ contract TruthStaking {
 		uint stakeEndTime = now + _stakeDuration;
 
 		statementID = absNumStatements++; //sets statementID and THEN increases absNumStatements by 1
-		statements[statementID] = Statement(statementID, _statement, _stakeDuration, stakeEndTime, msg.sender, 0, 0, false, _source);
+		statements[statementID] = Statement(statementID, _statement, _stakeDuration, now, stakeEndTime, msg.sender, 0, 0, false, _source);
 
 		emit NewStatement(statementID, _statement, stakeEndTime, _source);
 
@@ -165,8 +167,8 @@ contract TruthStaking {
 
 		if (pctTimeRemaining <= pctTimeRemainingThreshold) {
 
-		    assert(s.value > 0);
-		    uint percentOfCurrentPot = 100 * msg.value / s.value;
+		    assert(s.ethStaked > 0);
+		    uint percentOfCurrentPot = 100 * msg.value / s.ethStaked;
 		    
 		    if(percentOfCurrentPot >= minPotPctThreshold) {
 		        
@@ -183,7 +185,7 @@ contract TruthStaking {
 		}
 
 		// Update Statement value
-		s.value += msg.value;
+		s.ethStaked += msg.value;
 
 		// Add the stake to total pot
 		emit NewStake(_statementID, msg.value);
@@ -250,11 +252,13 @@ contract TruthStaking {
 			winningPot = p.T;
 			losingPot = p.F;
 			winningPosition = 1;
+			s.verdict = true;
 		}
 		else {
 			winningPot = p.F;
 			losingPot = p.T;
 			winningPosition = 0;
+			s.verdict = false;
 		}
 
 

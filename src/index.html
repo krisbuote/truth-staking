@@ -11,12 +11,10 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-    <style>
-      .collapse.remain {
-        background-color: yellow;
-      }
-    </style>
-
+    <!-- Data Table CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"> -->
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -83,41 +81,72 @@
             <p class="text-center">Loading...</p>
           </div>
           <div id="content" style="display: none;">
-            <h2 id="absEthStaked" class="display-3 text-center"></h2>
-            <h4 class="text-center font-weight-light">eth staked so far</h4>
+            <h2 id="absEthStaked" class="display-3 text-center">
+            <h5 class="text-center font-weight-light">eth staked on</h5>
+            <h2 id="absNumStatements" class="display-3 text-center"></h2>
+            <h5 class="text-center font-weight-light">claims</h5>
+            </h2>
             <br/>
             <hr/>
             <br/>
             <!-- <h2 id="absEthStaked" class="text-center"></h2> -->
             <br/>
+            <div> 
+              <p>Crowdsourcing the truth, with skin in the game. Seek the Truth, and Reap the Rewards. </p>
+              <p>How it works: stake ether on claims made by the media. If your peers agree with you, you win.
+              Earn a double reward for submitting a new claim.</p>
+              [stake now button]
+            </div>
 
-            <div id="accordion">
-              <div id="accordionStatementData">
-              </div>
+            <div id="liveStatementsAccordionTable">
+              <table id="statementTable" class="" width="100%"></table>
             </div>
 
             <br/>
-            <a href="./staking-history.html" class="btn btn-default">See all statements ></a>
+            <a href="./live-stakes.html" class="btn btn-default">See all live stakes </a>
             <hr/>
 
             <div class="new-statement">
-              <h2 class="text-center">Create new statement</h2>
+              <h2 class="text-center">Submit New Claim</h2>
+              <p class="text-center text-muted">win twice as much</p>
               <br/>
-              <form onSubmit="App.makeNewStatement();">
-                <label for="newStatementString">Enter new statement: </label>
-                <input type="text" id="newStatementString" placeholder="This sentence is false."/>
-                <br/>
+              <form onSubmit="App.makeNewStatement(newStatementString, newStatementPosition, newStatementStakingPeriod, newStatementSource, newStatementStakeValue); return false;">
+
                 <div class="form-group">
-                  <label for="newStatementPosition">Select Position</label>
-                  <select class="form-control" id="newStatementPosition"></select>
+                  <label for="newStatementString">Enter new statement: </label>
+                  <textarea class="form-control" id="newStatementString" rows="2"></textarea>
+                  <!-- <input type="text" class="form-control" id="newStatementString" placeholder="This sentence is false."/> -->
                 </div>
-                <label for="newStatementStakingPeriod">Set staking period (seconds): </label>
-                <input type="number" id="newStatementStakingPeriod" placeholder="3600"/> <br/>
-                <label for="newStatementSource">Statement source: </label> 
-                <input type="text" id="newStatementSource" placeholder="www.newyorktimes.com"/>
-                <label for="newStatementStakeValue">First Stake: </label>
-                <input type="number" id="newStatementStakeValue" placeholder="1.000 ether" step="0.000000000000000001"/>
-                <button type="submit" class="btn btn-primary">Create</button>
+                <div class="form-group row">
+                    <label for="newStatementPosition">The above statement is </label>
+                  <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
+                    <label button class="btn btn-light">
+                      <input type="radio" id="newStatementPositionTrue" value="1" name="newStatementPosition">True
+                    </label>
+                    <label button class="btn btn-light">
+                      <input type="radio" id="newStatementPositionFalse" value="0" name="newStatementPosition">False
+                    </label>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="newStatementStakingPeriod" class="col-4 col-form-label">Staking period (hours): </label>
+                  <div class="col-2">
+                    <input class="form-control text-center" type="number" id="newStatementStakingPeriod" placeholder="24"/>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="newStatementSource" class="col-4 col-form-label"">Statement source: </label> 
+                  <div class="col-8">
+                    <input class="form-control" type="text" id="newStatementSource" placeholder="www.newyorktimes.com"/>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="newStatementStakeValue" class="col-4 col-form-label"">First Stake: </label>
+                  <div class="col-8">
+                    <input class="form-control" type="number" id="newStatementStakeValue" placeholder="1.000 ether" step="0.000000000000000001"/>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
               </form>
             </div>
             <!-- <p id="timeRemaining" class="text-center"></p> -->
@@ -133,11 +162,16 @@
       </div>
     </div>
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <!--JQuery -->
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
     <script src="js/web3.min.js"></script>
     <script src="js/app.js"></script>
+
+    <!-- Data Table -->
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js""></script>
   </body>
 </html>

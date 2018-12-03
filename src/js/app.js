@@ -9,15 +9,12 @@ const Web3 = require('web3')
 const contractAddress = '0x4D348a7A1c237Fa3Cad122d28746972b3Aa0503F'
 const contractABI = [{"constant":false,"inputs":[{"name":"_newServiceFeeTenThousandths","type":"uint256"}],"name":"setServiceFeeTenThousandths","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"absNumStatements","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_statementID","type":"uint256"}],"name":"endStake","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"absEthStaked","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"serviceFeeTenThousandths","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_statementID","type":"uint256"},{"name":"_position","type":"uint256"}],"name":"stake","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"_beneficiaryAddress","type":"address"},{"name":"_potProportionTenThousandths","type":"uint256"}],"name":"setBeneficiaryCutTenThousandths","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"statements","outputs":[{"name":"id","type":"uint256"},{"name":"statement","type":"string"},{"name":"stakeDuration","type":"uint256"},{"name":"stakeEndTime","type":"uint256"},{"name":"marketMaker","type":"address"},{"name":"numStakes","type":"uint256"},{"name":"value","type":"uint256"},{"name":"stakeEnded","type":"bool"},{"name":"source","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"beneficiaryShares","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_statement","type":"string"},{"name":"_position","type":"uint256"},{"name":"_stakeDuration","type":"uint256"},{"name":"_source","type":"string"}],"name":"newStatement","outputs":[{"name":"statementID","type":"uint256"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"_newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"absNumStakes","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"statementID","type":"uint256"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"NewStake","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"statementID","type":"uint256"},{"indexed":false,"name":"finalPot","type":"uint256"},{"indexed":false,"name":"winningPosition","type":"uint256"}],"name":"StakeEnded","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"statementID","type":"uint256"},{"indexed":false,"name":"potBalance","type":"uint256"}],"name":"CurrentPot","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"statementID","type":"uint256"},{"indexed":false,"name":"statement","type":"string"},{"indexed":false,"name":"stakeEndTime","type":"uint256"},{"indexed":false,"name":"source","type":"string"}],"name":"NewStatement","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"statementID","type":"uint256"},{"indexed":false,"name":"stakerAddr","type":"address"},{"indexed":false,"name":"amount","type":"uint256"},{"indexed":false,"name":"stakedPosition","type":"uint256"}],"name":"CorrectStake","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"loopNumber","type":"uint256"}],"name":"LoopCheck","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"statementID","type":"uint256"}],"name":"StatementIDCheck","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"rewardTransfered","type":"uint256"}],"name":"RewardCheck","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"profitCalculated","type":"uint256"}],"name":"ProfitCheck","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"TPotValue","type":"uint256"},{"indexed":false,"name":"FPotValue","type":"uint256"}],"name":"PotsCheck","type":"event"}]
 
-var statementDict = new Object();
-var statementMap = new Map();
-var statementArray = new Array();
 
 App = {
 	web3Provider: null,
 	contracts: {},
   	truthStakingContract: null,
-  	statementArray: [],
+  	allStatementsArray: [],
   	account: '0x0',
 
 	init: function() {
@@ -138,97 +135,101 @@ App = {
 
 			if(!error) {
 
+				$("#absNumStatements").html(numStatements.toNumber());
+
 				var statementAccordionData = $('#accordionStatementData');
 				statementAccordionData.empty();
 
 				// Looped accordion builder
 				for (var i = 0; i < numStatements; i++) {
 
+					App.getStatementDataAndBuildLiveTable(i, numStatements, contractInstance);
 
-					contractInstance.statements(i, function(error, statement) {
-				  	var statementID = statement[0];
-					var statementText = statement[1];
-					var stakeDuration = statement[2];
-					var stakeEndTime = statement[3];
-					var marketMaker = statement[4];
-				 	var numStakes = statement[5];
-					var ethStaked = (statement[6] / 10**18).toFixed(3);
-					var stakeEnded = statement[7];
-					var statementSource = statement[8];
+
+					// contractInstance.statements(i, function(error, statement) {
+				 //  	var statementID = statement[0];
+					// var statementText = statement[1];
+					// var stakeDuration = statement[2];
+					// var stakeEndTime = statement[3];
+					// var marketMaker = statement[4];
+				 // 	var numStakes = statement[5];
+					// var ethStaked = (statement[6] / 10**18).toFixed(3);
+					// var stakeEnded = statement[7];
+					// var statementSource = statement[8];
 
 					// var stakeActiveClass = active || ending_soon || finished //inject into html class. style with custom css
 
 
-					var statementAccordionTemplate =`<div class="card bg-transparent border-light mb-3" id="card${statementID}">
+					// var statementAccordionTemplate =`<div class="card bg-transparent border-light mb-3" id="card${statementID}">
 
-										                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
-										                    <button class="btn btn-default" >
-										                      <h3 class="font-weight-light"><u>   ${ethStaked} eth   </u></h3>
-										                      <p class="font-weight-light">${statementText}</p>
-										                    </button>
-										                </div>
-
-
-
-										                <div class="card-body collapse" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}" data-parent="#accordion">
-
-											                <div class="card-body text-center">
-
-											                  	<form method="POST" onSubmit="App.makeStake(${statementID}, stakePosition${statementID}, stakeValue${statementID}); return false;">
+					// 					                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
+					// 					                    <button class="btn btn-default" >
+					// 					                      <h3 class="font-weight-light"><u>   ${ethStaked} eth   </u></h3>
+					// 					                      <p class="font-weight-light">${statementText}</p>
+					// 					                    </button>
+					// 					                </div>
 
 
-												                    <div class="stake-collapse" data-toggle="collapse" data-target="#card${statementID}Stake">
-													                    <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
-																		    <label button class="btn btn-light">
-																		    	<input type="radio" id="trueButton${statementID}" value="1" name="stakePosition${statementID}">True
-																		    </label>
-																		    <label button class="btn btn-dark">
-																		    	<input type="radio" id="falseButton${statementID}" value="0" name="stakePosition${statementID}">False
-																		    </label>
-																		</div>
-																	</div>
 
-																	</br>
+					// 					                <div class="card-body collapse" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}" data-parent="#liveStatementsAccordionTable">
 
-																	<div class="collapse text-center" id="card${statementID}Stake">
-																		<div class="input-group">
-																		    <div class="input-group-prepend">
-																		    	<span class="input-group-text text-monospace" for="stakeValue${statementID}">Stake Amount:</span>
-																		    </div>
-																		  	<input type="number" id="stakeValue${statementID}" name="stakeValue${statementID}" placeholder="1.000 ether" step="0.000000000000000001"/>
-																		  	<div class="input-group-append">
-																		    	<span class="input-group-text text-monospace">eth</span>
-																		  	</div>
-																		</div> <br/>
-																		<button type="submit" class="btn btn-primary">Stake</button>
-														                <hr/>
-																	</div>
-													            </form>
+					// 						                <div class="card-body text-center">
+
+					// 						                  	<form method="POST" onSubmit="App.makeStake(${statementID}, stakePosition${statementID}, stakeValue${statementID}); return false;">
+
+
+					// 							                    <div class="stake-collapse" data-toggle="collapse" data-target="#card${statementID}Stake">
+					// 								                    <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
+					// 													    <label button class="btn btn-light">
+					// 													    	<input type="radio" id="trueButton${statementID}" value="1" name="stakePosition${statementID}">True
+					// 													    </label>
+					// 													    <label button class="btn btn-dark">
+					// 													    	<input type="radio" id="falseButton${statementID}" value="0" name="stakePosition${statementID}">False
+					// 													    </label>
+					// 													</div>
+					// 												</div>
+
+					// 												</br>
+
+					// 												<div class="collapse text-center" id="card${statementID}Stake">
+					// 													<div class="input-group">
+					// 													    <div class="input-group-prepend">
+					// 													    	<span class="input-group-text text-monospace" for="stakeValue${statementID}">Stake Amount:</span>
+					// 													    </div>
+					// 													  	<input type="number" id="stakeValue${statementID}" name="stakeValue${statementID}" placeholder="1.000 ether" step="0.000000000000000001"/>
+					// 													  	<div class="input-group-append">
+					// 													    	<span class="input-group-text text-monospace">eth</span>
+					// 													  	</div>
+					// 													</div> <br/>
+					// 													<button type="submit" class="btn btn-primary">Stake</button>
+					// 									                <hr/>
+					// 												</div>
+					// 								            </form>
 
 
 
 											                  
-											                    <div class="statement-source text-center">
-											                    	<small class="text-muted">source: ${statementSource}</small>
-											                    </div>
+					// 						                    <div class="statement-source text-center">
+					// 						                    	<small class="text-muted">source: ${statementSource}</small>
+					// 						                    </div>
 
-											                    <div>
-											                    	<button type="button" class="btn btn-link btn-lg mt-0 float-right">
-																	  <a href="./about.html" class="fas fa-info-circle"></a>
-																	</button>
-																</div>
-
-
-											                  </div>
+					// 						                    <div>
+					// 						                    	<button type="button" class="btn btn-link btn-lg mt-0 float-right">
+					// 												  <a href="./about.html" class="fas fa-info-circle"></a>
+					// 												</button>
+					// 											</div>
 
 
-										                </div>
-										            </div>`
-
-					statementAccordionData.append(statementAccordionTemplate);
+					// 						                  </div>
 
 
-				});
+					// 					                </div>
+					// 					            </div>`
+
+					// statementAccordionData.append(statementAccordionTemplate);
+					//
+
+				// });
 
 						    /// TODO: PUT NETLIFY FORM IN CARD BODY.
 				}
@@ -255,19 +256,185 @@ App = {
 	
 	},
 
-	statementData: function(_statementID, _statementText) {
-		this.statementID = _statementID;
-		this.statementText = _statementText;
+
+	getStatementDataAndBuildLiveTable: function(_index, _numStatements, _contractInstance) {
+		// Queries blockchain for statement data
+
+		_contractInstance.statements(_index, function(error, statement) {
+
+			if(!error){
+				
+				App.allStatementsArray.push(statement); // Push to array
+
+				if (App.allStatementsArray.length == _numStatements) {
+					App.displayLiveDataTable(); // If all statements collected, build data table
+					// App.displayPastDataTable();
+				}
+			}
+
+			else{console.error(error)}
+
+		});
+
+
 	},
 
-	makeNewStatement: function() {
-		var newStatementString = $("#newStatementString").val();
-		var newStatementPosition = $("#newStatementPosition").val();
-		var newStatementStakingPeriod = $("#newStatementStakingPeriod").val();
-		var newStatementSource = $("#newStatementSource").val();
-		var newStatementStakeValue = $("#newStatementStakeValue").val();
+	displayLiveDataTable: function() {
 
-		console.log(newStatementString);
+		var liveStatementsData = [];
+
+		for (var i = 0; i < App.allStatementsArray.length; i++) {
+
+			var statement = App.allStatementsArray[i];
+
+		  	var statementID = statement[0];
+			var statementText = statement[1];
+			var stakeDuration = statement[2];
+			var stakeEndTime = statement[3];
+			var marketMaker = statement[4];
+		 	var numStakes = statement[5];
+			var ethStaked = (statement[6] / 10**18).toFixed(3);
+			var stakeEnded = statement[7];
+			var statementSource = statement[8];
+
+			var timeRemainingSeconds = Math.floor(stakeEndTime - Date.now()/1000);
+
+			var cardHtml = App.collapsingCardHTMLformat(statementID, statementText, ethStaked, statementSource, stakeEndTime);
+			var ethStakedHtml = `<p class="display-4 text-center">${ethStaked}</p>`
+
+			if (!stakeEnded) {
+				liveStatementsData.push([ethStakedHtml, cardHtml]);
+			}
+
+		}
+
+		console.log(liveStatementsData);
+
+		$('#statementTable').DataTable( {
+	        data: liveStatementsData,
+	        columns: [
+	            { title: "Sort by Value" },
+	            { title: "Sort by Recency"}  //TODO: Need to change html in collapsingCardHTMLformat() to data-order by recency
+	        ]
+	    });
+	},
+
+	// displayPastDataTable: function() {
+
+	// 	var pastStatementsData = [];
+
+	// 	for (var i = 0; i < App.allStatementsArray.length; i++) {
+
+	// 		var statement = App.allStatementsArray[i];
+
+	// 	  	var statementID = statement[0];
+	// 		var statementText = statement[1];
+	// 		var stakeDuration = statement[2];
+	// 		var stakeEndTime = statement[3];
+	// 		var marketMaker = statement[4];
+	// 	 	var numStakes = statement[5];
+	// 		var ethStaked = (statement[6] / 10**18).toFixed(3);
+	// 		var stakeEnded = statement[7];
+	// 		var statementSource = statement[8];
+
+	// 		var cardHtml = App.collapsingCardHTMLformat(statementID, statementText, ethStaked, statementSource);
+
+	// 		if (stakeEnded) {
+	// 			pastStatementsData.push([stakeEndTime, cardHtml]);
+	// 		}
+
+	// 	}
+
+	// 	console.log(pastStatementsData);
+
+	// 	$('#statementTable').DataTable( {
+	//         data: pastStatementsData,
+	//         columns: [
+	//             { title: "Recency" },
+	//             { title: "Eth"}
+	//         ]
+	//     });
+	// },
+
+	collapsingCardHTMLformat: function(statementID, statementText, ethStaked, statementSource, stakeEndTime) {
+
+		var html = `<td data-order="${stakeEndTime}">
+						<div class="card bg-transparent mb-3" id="card${statementID}">
+			                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
+			                    <button class="btn btn-default" >
+			                      <p class="font-weight-light">${statementText}</p>
+			                    </button>
+			                </div>
+
+
+
+			                <div class="card-body collapse" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}" data-parent="#liveStatementsAccordionTable">
+
+				                <div class="card-body text-center">
+
+				                  	<form method="POST" onSubmit="App.makeStake(${statementID}, stakePosition${statementID}, stakeValue${statementID}); return false;">
+
+
+					                    <div class="stake-collapse" data-toggle="collapse" data-target="#card${statementID}Stake">
+						                    <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
+											    <label button class="btn btn-light">
+											    	<input type="radio" id="trueButton${statementID}" value="1" name="stakePosition${statementID}">True
+											    </label>
+											    <label button class="btn btn-light">
+											    	<input type="radio" id="falseButton${statementID}" value="0" name="stakePosition${statementID}">False
+											    </label>
+											</div>
+										</div>
+
+										</br>
+
+										<div class="input-group">
+										    <div class="input-group-prepend">
+										    	<span class="input-group-text text-monospace" for="stakeValue${statementID}">Stake Amount:</span>
+										    </div>
+										  	<input type="number" id="stakeValue${statementID}" name="stakeValue${statementID}" placeholder="1.000 ether" step="0.000000000000000001"/>
+										  	<div class="input-group-append">
+										    	<span class="input-group-text text-monospace">eth</span>
+										  	</div>
+										</div> <br/>
+										<button type="submit" class="btn btn-primary">Stake</button>
+						                <hr/>
+
+						            </form>
+
+
+
+				                  
+				                    <div class="statement-source text-center">
+				                    	<small class="text-muted">source: ${statementSource}</small>
+				                    </div>
+
+				                    <div>
+				                    	<button type="button" class="btn btn-link btn-lg mt-0 float-right">
+										  <a href="./about.html" class="fas fa-info-circle"></a>
+										</button>
+									</div>
+
+
+				                  </div>
+
+
+			                </div>
+			            </div>
+			        </td>`
+
+		return html
+
+	},
+	makeNewStatement: function(_newStatementString, _newStatementPosition, _newStatementStakingPeriod, _newStatementSource, _newStatementStakeValue) {
+
+		var newStatementString = _newStatementString.value;
+		var newStatementPosition = _newStatementPosition.value;
+		var newStatementStakingPeriod = _newStatementStakingPeriod.value*3600;
+		var newStatementSource = _newStatementSource.value;
+		var newStatementStakeValue = _newStatementStakeValue.value;
+
+		console.log(newStatementString, newStatementPosition, newStatementStakingPeriod, newStatementSource, newStatementStakeValue);
 
 		if (!newStatementString || !newStatementPosition || !newStatementStakingPeriod || !newStatementSource || !newStatementStakeValue){	
 			console.log("Please complete the form.");
@@ -285,7 +452,7 @@ App = {
 			contractInstance.newStatement(newStatementString, newStatementPosition, newStatementStakingPeriod, newStatementSource, txObject, function(err, result) {
 				if(!err) {
 					alert("Success! It will take some time to appear on the blockchain.");
-					console.log("makeNewStatement success! new statementID: ", result);
+					console.log("makeNewStatement success! tx hash:", result);
 				}
 				else {
 					console.error(err);
