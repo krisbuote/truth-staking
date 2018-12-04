@@ -14,7 +14,6 @@
     <!-- Data Table CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -76,7 +75,7 @@
     <div class="container" style="width: 650px;">
       <div class="row">
         <div class="col-lg-12">
-          <h1 class="text-center">All Statenebts</h1>
+          <h1 class="display-1 text-center">Live Stakes</h1>
           <hr/>
           <br/>
           <div id="loader">
@@ -85,62 +84,61 @@
           <div id="content" style="display: none;">
 
 
-            <div id="accordion">
-              <table id="statementTable" class="display" width="100%"></table>
+            <div id="liveStatementsAccordionTable">
+              <table id="liveStatementTable" class="" width="100%"></table>
             </div>
 
-     <!--        <table class="table">
-              <thead>
-                <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col"># Stakes</th>
-                  <th scope="col">Statement</th>
-                </tr>
-              </thead>
-              <tbody id="statementInfo">
-              </tbody>
-            </table> -->
-            <br/>
-            <hr/>
-            <div class="stake-selection">
-              <h2 class="text-center">Stake on a statement</h2>
-              <br/>
-              <form onSubmit="App.makeStake(); return false;">
-                <label for="statementIdToStake">Statement ID: </label>
-                <input type="number" id="statementIdToStake" placeholder="1" step="1"/>
-                <br/>
-                <br/>
-                <div class="form-group">
-                  <label for="positionSelect">Select Position</label>
-                  <select class="form-control" id="positionSelect"></select>
-                </div>
-                <label for="stakeValue">Stake Amount: </label>
-                <input type="number" id="stakeValue" placeholder="1.000 ether" step="0.000000000000000001"/>
-                <button type="submit" class="btn btn-primary">Stake</button>
-                
-                <hr />
-              </form>
-            </div>
+              <hr/>
 
-            <div class="new-statement">
-              <h2 class="text-center">Create new statement</h2>
-              <br/>
-              <form onSubmit="App.makeNewStatement();">
-                <label for="newStatementString">Enter new statement: </label>
-                <input type="text" id="newStatementString" placeholder="This sentence is false."/>
+              <div id="new-statement">
+                <h2 class="text-center display-4">Submit New Claim</h2>
+                <p class="text-center text-muted">win twice as much</p>
                 <br/>
-                <label for="newStatementStakingPeriod">Set staking period (seconds): </label>
-                <input type="number" id="newStatementStakingPeriod" placeholder="3600"/>
-                <button type="submit" class="btn btn-primary">Create</button>
+                <form onSubmit="App.makeNewStatement(newStatementString, newStatementPosition, newStatementStakingPeriod, newStatementSource, newStatementStakeValue); return false;">
+
+                  <div class="form-group">
+                    <label for="newStatementString">Paste new statement: </label>
+                    <textarea class="form-control" id="newStatementString" rows="2"></textarea>
+                    <!-- <input type="text" class="form-control" id="newStatementString" placeholder="This sentence is false."/> -->
+                  </div>
+                  <div class="form-group row">
+                      <label for="newStatementPosition" class="col-4 col-form-label">The above statement is </label>
+                    <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
+                      <label button class="btn btn-light">
+                        <input type="radio" id="newStatementPositionTrue" value="1" name="newStatementPosition">True
+                      </label>
+                      <label button class="btn btn-light">
+                        <input type="radio" id="newStatementPositionFalse" value="0" name="newStatementPosition">False
+                      </label>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="newStatementStakingPeriod" class="col-4 col-form-label">Staking period (hours): </label>
+                    <div class="col-2">
+                      <input class="form-control text-center" type="number" id="newStatementStakingPeriod" placeholder="48"/>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="newStatementSource" class="col-4 col-form-label"">Statement source: </label> 
+                    <div class="col-8">
+                      <input class="form-control" type="text" id="newStatementSource" placeholder="www.newyorktimes.com"/>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="newStatementStakeValue" class="col-4 col-form-label"">First Stake: </label>
+                    <div class="col-8">
+                      <input class="form-control" type="number" id="newStatementStakeValue" placeholder="1.000 ether" step="0.000000000000000001"/>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+              </div>
+            
+            
+              <form onSubmit="App.endStakeNow();">
+                <button type="submit" class="btn btn-primary">End Stake</button>
               </form>
-            </div>
-            <br/>
-            
-            
-            <form onSubmit="App.endStakeNow();">
-              <button type="submit" class="btn btn-primary">End Stake</button>
-            </form>
-            <p id="accountAddress" class="text-center"></p>
+              <p id="accountAddress" class="text-center"></p>
           </div>
         </div>
       </div>
@@ -152,7 +150,7 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
     <script src="js/web3.min.js"></script>
-    <script src="js/appDataTable.js"></script>
+    <script src="js/appLiveDataTable.js"></script>
 
     <!-- Data Table -->
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>

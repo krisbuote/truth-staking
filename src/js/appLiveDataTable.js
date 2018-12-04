@@ -139,12 +139,11 @@ App = {
 				var numStatements = _numStatements.toNumber();
 
 				App.allStatementsArray = [];
-				var allStatementsArray = [];
 				console.log(numStatements);
 
 				for (var i = 0; i < numStatements; i++) {
 
-					App.getStatementDataAndBuildTable(i, numStatements, contractInstance);
+					App.getStatementDataAndBuildLiveTable(i, numStatements, contractInstance);
 
 				}
 
@@ -164,7 +163,7 @@ App = {
 
 	
 
-	getStatementDataAndBuildTable: function(_index, _numStatements, _contractInstance) {
+	getStatementDataAndBuildLiveTable: function(_index, _numStatements, _contractInstance) {
 		// Queries blockchain for statement data
 		_contractInstance.statements(_index, function(error, statement) {
 
@@ -204,78 +203,79 @@ App = {
 
 			var timeRemainingSeconds = Math.floor(stakeEndTime - Date.now()/1000);
 
-			var cardHtml = App.collapsingCardHTMLformat(statementID, statementText, ethStaked, statementSource);
+			var cardHtml = App.collapsingCardHTMLformat(statementID, statementText, ethStaked, statementSource, stakeEndTime);
+			var ethStakedHtml = `<p class="display-4 text-center">${ethStaked}</p>`
 
 			if (!stakeEnded) {
-				liveStatementsData.push([stakeEndTime, cardHtml]);
+				liveStatementsData.push([ethStakedHtml, cardHtml]);
 			}
 
 		}
 
 		console.log(liveStatementsData);
 
-		$('#statementTable').DataTable( {
+		$('#liveStatementTable').DataTable( {
 	        data: liveStatementsData,
 	        columns: [
-	            { title: "Recency" },
-	            { title: "Eth"}
-	        ]
+	            { title: "Sort by Value" },
+	            { title: "Sort by Recency"}  //TODO: Need to change html in collapsingCardHTMLformat() to data-order by recency
+	        ],
+	        "order": [[ 0, "desc" ]]
 	    });
 	},
 
-	collapsingCardHTMLformat: function(statementID, statementText, ethStaked, statementSource) {
+	collapsingCardHTMLformat: function(statementID, statementText, ethStaked, statementSource, stakeEndTime) {
 
-		var html = `<td data-order="${ethStaked}">
-						<div class="card bg-transparent border-light mb-3" id="card${statementID}">
+		var html = `<td data-order="${stakeEndTime}">
+						<div class="card bg-transparent mb-3" id="card${statementID}">
 			                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
 			                    <button class="btn btn-default" >
-			                      <h3 class="font-weight-light"><u>   ${ethStaked} eth   </u></h3>
-			                      <p class="font-weight-light">${statementText}</p>
+			                    	<abbr class="text-center lead">${ethStaked} eth</abbr>
+			                      	<p class="font-weight-light">${statementText}</p>
 			                    </button>
 			                </div>
 
 
 
-			                <div class="card-body collapse" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}" data-parent="#accordion">
+			                <div class="card-body collapse" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}" data-parent="#liveStatementsAccordionTable">
 
 				                <div class="card-body text-center">
 
 				                  	<form method="POST" onSubmit="App.makeStake(${statementID}, stakePosition${statementID}, stakeValue${statementID}); return false;">
 
-
-					                    <div class="stake-collapse" data-toggle="collapse" data-target="#card${statementID}Stake">
+				                  		<div>
 						                    <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
 											    <label button class="btn btn-light">
 											    	<input type="radio" id="trueButton${statementID}" value="1" name="stakePosition${statementID}">True
 											    </label>
-											    <label button class="btn btn-dark">
+											    <label button class="btn btn-light">
 											    	<input type="radio" id="falseButton${statementID}" value="0" name="stakePosition${statementID}">False
 											    </label>
 											</div>
 										</div>
-
-										</br>
-
-										<div class="collapse text-center" id="card${statementID}Stake">
-											<div class="input-group">
-											    <div class="input-group-prepend">
-											    	<span class="input-group-text text-monospace" for="stakeValue${statementID}">Stake Amount:</span>
-											    </div>
-											  	<input type="number" id="stakeValue${statementID}" name="stakeValue${statementID}" placeholder="1.000 ether" step="0.000000000000000001"/>
-											  	<div class="input-group-append">
-											    	<span class="input-group-text text-monospace">eth</span>
-											  	</div>
-											</div> <br/>
-											<button type="submit" class="btn btn-primary">Stake</button>
-							                <hr/>
+									
+										<br/>
+										<div class="container">
+											<div class="row align-items-center">
+												<div class="input-group">
+												    <div class="input-group-prepend">
+												    	<span class="input-group-text text-monospace text-center" for="stakeValue${statementID}">Stake Amount (eth):</span>
+												    </div>
+												  	<input class="text-center" type="number" id="stakeValue${statementID}" name="stakeValue${statementID}" placeholder="1.750" step="0.001"/>
+												  	<span class="input-group-btn">
+												        <button class="btn btn-primary" type="submit">Stake</button>
+												    </span>
+												</div> 
+											</div>
 										</div>
+
+						                <hr/>
+
 						            </form>
-
-
 
 				                  
 				                    <div class="statement-source text-center">
-				                    	<small class="text-muted">source: ${statementSource}</small>
+				                    	<small class="text-muted">source: <a href="https://www.google.com/search?q=${statementSource}" target="_blank"> ${statementSource}</a></small>
 				                    </div>
 
 				                    <div>
@@ -285,7 +285,7 @@ App = {
 									</div>
 
 
-				                  </div>
+				                </div>
 
 
 			                </div>
