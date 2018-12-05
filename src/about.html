@@ -3,12 +3,26 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>Truth Staking</title>
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+
+    <!-- Data Table CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"> -->
+
+    <!-- Kris' Grayscale -->
+    <link href="css/kris-grayscale.css" rel="stylesheet">
+
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -18,76 +32,165 @@
     <![endif]-->
   </head>
 
-  <nav>
-    <nav class="navbar navbar-inverse">
-    <div class="container-fluid">
-      <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="./index.html">TS</a>
-      </div>
 
-      <!-- Collect the nav links, forms, and other content for toggling -->
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        <ul class="nav navbar-nav">
-          <li><a href="./staking-history.html">Staking History <span class="sr-only">(current)</span></a></li>
-          <li><a href="./all-statements.html">All Statements</a></li>
-        </ul>
-        <form class="navbar-form navbar-left">
-          <div class="form-group">
-            <input type="text" class="form-control" placeholder="Search">
-          </div>
-          <button type="submit" class="btn btn-default">Submit</button>
-        </form>
-        <ul class="nav navbar-nav navbar-right">
-          <li><a class="active" href="./about.html">About</a></li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
-            <ul class="dropdown-menu">
-              <li><a href="#">Action</a></li>
-              <li><a href="#">Another action</a></li>
-              <li><a href="#">Something else here</a></li>
-              <li role="separator" class="divider"></li>
-              <li><a href="#">Separated link</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div><!-- /.navbar-collapse -->
-    </div><!-- /.container-fluid -->
-  </nav>
+
 
   <body>
-    <div class="container" style="width: 650px;">
-      <div class="row">
-        <div class="col-lg-12">
-          <h1 class="text-center">What is Truth Staking?</h1>
-          <hr/>
-          <br/>
-          <div id="loader">
-            <p class="text-center">Loading...</p>
-          </div>
-          <div id="content" style="display: none;">
-            <p> Crowdsourcing the truth with skin in the game. </p>
-            
 
 
-
-            <p id="accountAddress" class="text-center"></p>
-          </div>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+      <div class="container">
+        <a class="navbar-brand js-scroll-trigger" href="/index.html">TS</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          Menu
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="/about.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="/live-stakes.html">Stakes</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="#new-claim">New Claim</a>
+            </li>
+          </ul>
         </div>
       </div>
-    </div>
+    </nav>
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Header -->
+    <header>
+      <div class="container d-flex h-100 align-items-center">
+      </div>
+    </header>
+
+
+    <!-- About Section -->
+    <section id="about">
+      <div class="container">
+        <div class="col-lg-8 mx-auto">
+
+          <div class="mx-auto text-center">
+            <h1 class="mx-auto my-0">What is Truth Staking?</h1>
+          </div>
+
+          <div class="text-justify">
+            <p>Truth Staking is the creation of a new free market.<b> In this market, anyone can stake cryptocurrency on claims made by the media.</b> </p>    
+            <p>
+            Instead of relying on political pundits, Truth Staking enables the crowd to speculate on the honesty of the media and provide a fact-checking service. In return, they receive a reward for doing so. Truth Staking is a new free market on media; players are rewarded for fact-checking, and content producers are rewarded for creating great content.</p>
+          </div>
+
+          <div class="mx-auto text-center">
+            <h1 class="mx-auto my-0">How Does it Work?</h1>
+            <div class="text-justify">
+              <p>Anyone can stake cryptocurrency on claims made by the media as being true or false. All of the money staked on a claim is stored in a smart contract. At the end of the staking period, the sums of cryptocurrency placed on True and False are counted. The larger pot wins. The losing pot's money is divvied up and delivered to the winners. The larger your stake is, the larger your share of the winnings. All of this is done algorithmically via a smart contract which can be viewed <a href="todo smart contractlink">here</a>. Because Truth Staking exists on the blockchain, it is transparent and censorship-resistant. No one can control the outcome other than by putting their money on the line.</p>
+            </div>
+          </div>
+
+          <div class="mx-auto text-center">
+            <h1 class="mx-auto my-0">Why?</h1>
+            <div class="text-justify">
+              <p>Since the advent of the internet, the cost of sharing information has rapidly been approaching zero. Information wants to be free, but it is not free to produce. As a result, most content producers now rely entirely on advertisers to earn a decent living. The current economic model for information is incentvizing clicks and views. This incentivization structure has led to the downstream effect of clickbait, outrage, fake news, and creepy data collection. Truth Staking is an attempt to get back to the peer-to-peer information economy.</p>
+            </div>
+          </div>
+
+          <div class="mx-auto text-center">
+            <h1 class="mx-auto my-0">What's the Best Strategy?</h1>
+            <div class="text-justify">
+              <p>The game rewards peer-consensus. Because you don't know how your peers will behave, the best strategy is to stake honestly with what you believe to be true. Furthermore, it is in your best interest to research the claim, because that's what other players will be doing. From a game theory perspective, there is a <a href="https://en.wikipedia.org/wiki/Focal_point_(game_theory)">focal point</a> on the truth.</p>
+            </div>
+          </div>
+          
+          <a href="#live-stakes" class="btn btn-primary js-scroll-trigger">View Stakes</a>
+        </div>
+      </div>
+    </section>
+ 
+
+    <!-- Contact Section -->
+    <section class="contact-section bg-black">
+      <div class="container">
+
+        <div class="row">
+
+          <div class="col-md-4 mb-3 mb-md-0">
+            <div class="card py-4 h-100">
+              <div class="card-body text-center">
+                <i class="fas fa-map-marked-alt text-primary mb-2"></i>
+                <h4 class="text-uppercase m-0">Address</h4>
+                <hr class="my-4">
+                <div class="small text-black-50">4923 Market Street, Orlando FL</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-3 mb-md-0">
+            <div class="card py-4 h-100">
+              <div class="card-body text-center">
+                <i class="fas fa-envelope text-primary mb-2"></i>
+                <h4 class="text-uppercase m-0">Email</h4>
+                <hr class="my-4">
+                <div class="small text-black-50">
+                  <a href="#">hello@yourdomain.com</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-3 mb-md-0">
+            <div class="card py-4 h-100">
+              <div class="card-body text-center">
+                <i class="fas fa-mobile-alt text-primary mb-2"></i>
+                <h4 class="text-uppercase m-0">Phone</h4>
+                <hr class="my-4">
+                <div class="small text-black-50">+1 (555) 902-8832</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="social d-flex justify-content-center">
+          <a href="#" class="mx-2">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="#" class="mx-2">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="#" class="mx-2">
+            <i class="fab fa-github"></i>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black small text-center text-white-50">
+      <div class="container">
+        Copyright &copy; Truth Staking 2018
+      </div>
+    </footer>
+
+    <!--JQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
     <script src="js/web3.min.js"></script>
     <script src="js/app.js"></script>
+
+    <!-- Data Table -->
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js""></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for this template -->
+    <script src="js/grayscale.min.js"></script>
   </body>
 </html>

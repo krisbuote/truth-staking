@@ -25,7 +25,7 @@ contract TruthStaking {
 		uint ethStaked;
 		bool stakeEnded;
 		string source;
-		bool verdict;
+		uint verdict;
 		mapping(uint => Stake) stakes; // TODO: Make private?
 	}
 
@@ -252,13 +252,13 @@ contract TruthStaking {
 			winningPot = p.T;
 			losingPot = p.F;
 			winningPosition = 1;
-			s.verdict = true;
+			s.verdict = 1;
 		}
 		else {
 			winningPot = p.F;
 			losingPot = p.T;
 			winningPosition = 0;
-			s.verdict = false;
+			s.verdict = 0;
 		}
 
 
