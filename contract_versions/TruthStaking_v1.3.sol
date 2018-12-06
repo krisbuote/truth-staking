@@ -3,6 +3,8 @@
 // Winnings are distributed automatically as determined by majority stake at the end of staking round.
 // ***** WORK IN PROGRESS *****
 
+// _v1.3 -- marketMakerRewards, events modified, SetAddTimeParameters function built
+
 pragma solidity ^0.4.2;
 
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
@@ -334,7 +336,7 @@ contract TruthStaking {
 								  uint _newMinTimeAddPct, 
 								  uint _newMaxTimeAddPct, 
 								  uint _newMinPotPctThreshold, 
-								  uint _newMaxPotPctThreshold )
+								  uint _newMaxPotPctThreshold)
 								  public onlyOwner {
 
 		pctTimeRemainingThreshold = _newPctTimeRemainingThreshold;
