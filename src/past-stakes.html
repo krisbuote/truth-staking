@@ -3,17 +3,26 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Past Stakes</title>
+    <title>Truth Staking</title>
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
+
+    <!-- Custom Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+
     <!-- Data Table CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"> -->
+
+    <!-- Custom Grayscale -->
+    <link href="css/custom-grayscale.css" rel="stylesheet">
+
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -23,121 +32,190 @@
     <![endif]-->
   </head>
 
-  <nav>
-    <nav class="navbar navbar-inverse">
-    <div class="container-fluid">
-      <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
+  <body class="bg-light">
+
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+      <div class="container">
+        <a class="navbar-brand js-scroll-trigger" href="/index.html">TS</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          Menu
+          <i class="fas fa-bars"></i>
         </button>
-        <a class="navbar-brand" href="./index.html">TS</a>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="/live-stakes.html">Stakes</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="/past-stakes.html">History</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="#new-claim">New Claim</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="/about.html">About</a>
+            </li>
+          </ul>
+        </div>
       </div>
+    </nav>
 
-      <!-- Collect the nav links, forms, and other content for toggling -->
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        <ul class="nav navbar-nav">
-          <li><a href="./staking-history.html">Staking History <span class="sr-only">(current)</span></a></li>
-          <li class="active"><a href="./all-statements.html">All Statements</a></li>
-
-          
-        </ul>
-        <form class="navbar-form navbar-left">
-          <div class="form-group">
-            <input type="text" class="form-control" placeholder="Search">
-          </div>
-          <button type="submit" class="btn btn-default">Submit</button>
-        </form>
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href="./about.html">About</a></li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
-            <ul class="dropdown-menu">
-              <li><a href="#">Action</a></li>
-              <li><a href="#">Another action</a></li>
-              <li><a href="#">Something else here</a></li>
-              <li role="separator" class="divider"></li>
-              <li><a href="#">Separated link</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div><!-- /.navbar-collapse -->
-    </div><!-- /.container-fluid -->
-  </nav>
-
-
-
-
-  <body>
-    <div class="container" style="width: 650px;">
-      <div class="row">
-        <div class="col-lg-12">
-          <h1 class="display-1 text-center">Past Stakes</h1>
-          <hr/>
-          <br/>
-          <div id="loader">
-            <p class="text-center">Loading...</p>
-          </div>
-          <div id="content" style="display: none;">
-
-
-            <div id="pastStatementsAccordionTable">
-              <table id="pastStatementTable" class="" width="100%"></table>
+    <!-- Header -->
+    <header class="stake-head">
+      <div class="container d-flex h-100 align-items-center">
+        <div class="mx-auto text-center">
+          <h1 class="display-1 mx-auto">Past Stakes</h1>
+        </div>
+      </div>
+      <div class="container">
+        <div class="mx-auto text-center">
+          <div class="my-5">
+            <div class="eth-staked">
+              <h2 class="display-4" id="pastEthStaked"></h2>
+              <h3>eth staked on</h3>
+              <h2 class="display-4" id="pastNumStatements"></h2>
+              <h3>claims</h3>
             </div>
-
-            <hr/>
-            <div id="new-statement">
-              <h2 class="text-center display-4">Submit New Claim</h2>
-              <p class="text-center text-muted">win twice as much</p>
-              <br/>
-              <form onSubmit="App.makeNewStatement(newStatementString, newStatementPosition, newStatementStakingPeriod, newStatementSource, newStatementStakeValue); return false;">
-
-                <div class="form-group">
-                  <label for="newStatementString">Paste new statement: </label>
-                  <textarea class="form-control" id="newStatementString" rows="2"></textarea>
-                  <!-- <input type="text" class="form-control" id="newStatementString" placeholder="This sentence is false."/> -->
-                </div>
-                <div class="form-group row">
-                    <label for="newStatementPosition" class="col-4 col-form-label">The above statement is </label>
-                  <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
-                    <label button class="btn btn-light">
-                      <input type="radio" id="newStatementPositionTrue" value="1" name="newStatementPosition">True
-                    </label>
-                    <label button class="btn btn-light">
-                      <input type="radio" id="newStatementPositionFalse" value="0" name="newStatementPosition">False
-                    </label>
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <label for="newStatementStakingPeriod" class="col-4 col-form-label">Staking period (hours): </label>
-                  <div class="col-2">
-                    <input class="form-control text-center" type="number" id="newStatementStakingPeriod" placeholder="48"/>
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <label for="newStatementSource" class="col-4 col-form-label"">Statement source: </label> 
-                  <div class="col-8">
-                    <input class="form-control" type="text" id="newStatementSource" placeholder="www.newyorktimes.com"/>
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <label for="newStatementStakeValue" class="col-4 col-form-label"">First Stake: </label>
-                  <div class="col-8">
-                    <input class="form-control" type="number" id="newStatementStakeValue" placeholder="1.000 ether" step="0.000000000000000001"/>
-                  </div>
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-              </form>
-            </div>
-
-            <p id="accountAddress" class="text-center"></p>
           </div>
         </div>
       </div>
+    </header>
+
+
+  
+    <div id="loader" class="blockchain-loader bg-light">
+      <p class="text-center bg-light">Contacting blockchain...</p>
+    </div> 
+    
+    <div id="blockchain-content bg-light">
+
+      <!-- stakes Section -->
+      <section id="past-stakes" class="bg-light py-5">
+        <div class="container">
+          <!-- past Stakes -->  
+          <div id="pastStatementsAccordionTable">
+            <table id="pastStatementTable" class="" width="100%"></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- New Statement Section -->
+      <section id="new-claim" class="signup-section text-white">
+        <div class="container">
+          <h2 class="text-center display-4">Submit New Claim</h2>
+          <p class="text-center">earn double the reward for submitting a new claim</p>
+          <br/>
+          <form onSubmit="App.makeNewStatement(newStatementString, newStatementPosition, newStatementStakingPeriod, newStatementSource, newStatementStakeValue); return false;">
+            <div class="text-right">
+              <div class="form-group row">
+                <label for="newStatementString" class="col-3 col-form-label">Paste new statement: </label>
+                <textarea class="form-control col-9" id="newStatementString" rows="2"></textarea>
+                <!-- <input type="text" class="form-control" id="newStatementString" placeholder="This sentence is false."/> -->
+              </div>
+              <div class="form-group row">
+                  <label for="newStatementPosition" class="col-3 col-form-label">The above statement is </label>
+                <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
+                  <label button class="btn btn-light">
+                    <input type="radio" id="newStatementPositionTrue" value="1" name="newStatementPosition">True
+                  </label>
+                  <label button class="btn btn-light">
+                    <input type="radio" id="newStatementPositionFalse" value="0" name="newStatementPosition">False
+                  </label>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="newStatementStakeValue" class="col-3 col-form-label"">First Stake: </label>
+                <div class="col-2">
+                  <input class="form-control text-center" type="number" id="newStatementStakeValue" placeholder="0.750 ether" step="0.000001"/>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="newStatementStakingPeriod" class="col-3 col-form-label">Staking period (days): </label>
+                <div class="col-2">
+                  <input class="form-control text-center" type="number" id="newStatementStakingPeriod" placeholder="7 days"/>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="newStatementSource" class="col-3 col-form-label"">Statement source: </label> 
+                <div class="col-4">
+                  <input class="form-control text-center" type="text" id="newStatementSource" placeholder="www.newyorktimes.com"/>
+                </div>
+              </div>
+
+            </div>
+            <div class="col-md-12 text-center"> 
+              <button type="submit" class="btn btn-primary float-right">Submit</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Contact Section -->
+      <section class="contact-section bg-black">
+        <div class="container">
+
+          <div class="row">
+
+            <div class="col-md-4 mb-3 mb-md-0">
+              <div class="card py-4 h-100">
+                <div class="card-body text-center">
+                  <i class="fas fa-map-marked-alt text-primary mb-2"></i>
+                  <h4 class="text-uppercase m-0">Address</h4>
+                  <hr class="my-4">
+                  <div class="small text-black-50">4923 Market Street, Orlando FL</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4 mb-3 mb-md-0">
+              <div class="card py-4 h-100">
+                <div class="card-body text-center">
+                  <i class="fas fa-envelope text-primary mb-2"></i>
+                  <h4 class="text-uppercase m-0">Email</h4>
+                  <hr class="my-4">
+                  <div class="small text-black-50">
+                    <a href="#">hello@yourdomain.com</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4 mb-3 mb-md-0">
+              <div class="card py-4 h-100">
+                <div class="card-body text-center">
+                  <i class="fas fa-mobile-alt text-primary mb-2"></i>
+                  <h4 class="text-uppercase m-0">Phone</h4>
+                  <hr class="my-4">
+                  <div class="small text-black-50">+1 (555) 902-8832</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="social d-flex justify-content-center">
+            <a href="#" class="mx-2">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" class="mx-2">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" class="mx-2">
+              <i class="fab fa-github"></i>
+            </a>
+          </div>
+
+        </div>
+      </section>
     </div>
+
+    <!-- Footer -->
+    <footer class="bg-black small text-center text-white-50">
+      <div class="container">
+        Copyright &copy; Truth Staking 2018
+      </div>
+    </footer>
 
     <!--JQuery -->
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
@@ -151,5 +229,10 @@
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js""></script>
 
+    <!-- Plugin JavaScript -->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for this template -->
+    <script src="js/grayscale.min.js"></script>
   </body>
 </html>

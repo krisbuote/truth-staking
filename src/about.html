@@ -20,8 +20,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
     <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"> -->
 
-    <!-- Kris' Grayscale -->
-    <link href="css/kris-grayscale.css" rel="stylesheet">
+    <!-- Custom Grayscale -->
+    <link href="css/custom-grayscale.css" rel="stylesheet">
 
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -39,7 +39,7 @@
 
 
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="secondaryNav">
       <div class="container">
         <a class="navbar-brand js-scroll-trigger" href="/index.html">TS</a>
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,13 +49,16 @@
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-              <a class="nav-link js-scroll-trigger" href="/about.html">About</a>
-            </li>
-            <li class="nav-item">
               <a class="nav-link js-scroll-trigger" href="/live-stakes.html">Stakes</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link js-scroll-trigger" href="#new-claim">New Claim</a>
+              <a class="nav-link js-scroll-trigger" href="/past-stakes.html">History</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="/index.html#new-claim">New Claim</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="#">About</a>
             </li>
           </ul>
         </div>
@@ -63,49 +66,56 @@
     </nav>
 
     <!-- Header -->
-    <header>
+    <header class="about-page-header">
       <div class="container d-flex h-100 align-items-center">
+        <div class="mx-auto text-center">
+          <h1 class="mx-auto my-0">About</h1>
+        </div>
       </div>
     </header>
 
 
     <!-- About Section -->
     <section id="about">
-      <div class="container">
+      <div class="container about-page">
         <div class="col-lg-8 mx-auto">
 
-          <div class="mx-auto text-center">
-            <h1 class="mx-auto my-0">What is Truth Staking?</h1>
-          </div>
-
-          <div class="text-justify">
-            <p>Truth Staking is the creation of a new free market.<b> In this market, anyone can stake cryptocurrency on claims made by the media.</b> </p>    
-            <p>
-            Instead of relying on political pundits, Truth Staking enables the crowd to speculate on the honesty of the media and provide a fact-checking service. In return, they receive a reward for doing so. Truth Staking is a new free market on media; players are rewarded for fact-checking, and content producers are rewarded for creating great content.</p>
-          </div>
-
-          <div class="mx-auto text-center">
-            <h1 class="mx-auto my-0">How Does it Work?</h1>
-            <div class="text-justify">
-              <p>Anyone can stake cryptocurrency on claims made by the media as being true or false. All of the money staked on a claim is stored in a smart contract. At the end of the staking period, the sums of cryptocurrency placed on True and False are counted. The larger pot wins. The losing pot's money is divvied up and delivered to the winners. The larger your stake is, the larger your share of the winnings. All of this is done algorithmically via a smart contract which can be viewed <a href="todo smart contractlink">here</a>. Because Truth Staking exists on the blockchain, it is transparent and censorship-resistant. No one can control the outcome other than by putting their money on the line.</p>
+          <div class="mx-auto text-left">
+            <h4 class="mx-auto">What is Truth Staking?</h4>
+            <br/>
+            <div class="text-justify py-3">
+              <p><b>Truth staking is speculation on the media.</b></p>
+              <p>In this new free market, <b>anyone can stake cryptocurrency on claims made by the media.</b>
+              Instead of relying on political pundits, truth staking enables the crowd to speculate on the honesty of the media and provide a fact-checking service. Players are rewarded for fact-checking, and content producers are rewarded for creating great content.</p>
             </div>
           </div>
 
-          <div class="mx-auto text-center">
-            <h1 class="mx-auto my-0">Why?</h1>
-            <div class="text-justify">
-              <p>Since the advent of the internet, the cost of sharing information has rapidly been approaching zero. Information wants to be free, but it is not free to produce. As a result, most content producers now rely entirely on advertisers to earn a decent living. The current economic model for information is incentvizing clicks and views. This incentivization structure has led to the downstream effect of clickbait, outrage, fake news, and creepy data collection. Truth Staking is an attempt to get back to the peer-to-peer information economy.</p>
+          <div class="mx-auto text-left">
+            <h4 class="mx-auto">How Does it Work?</h4>
+            <div class="text-justify py-3">
+              <p><b>Truth staking is run on the ethereum blockchain and managed entirely by smart contracts.</b></p>
+              <p>Anyone can stake cryptocurrency on claims made by the media as being true or false. All of the money staked is stored in a smart contract. At the end of the staking period, the sums of cryptocurrency placed on True and False are counted. The larger pot wins. The losing pot's money is divvied up and delivered to the winners. The larger your stake is, the larger your share of the winnings. All of this is done algorithmically via a smart contract which can be <a href="https://ropsten.etherscan.io/address/0x4d348a7a1c237fa3cad122d28746972b3aa0503f" target="_blank">viewed here</a>. Because Truth Staking exists on the blockchain, it is censorship-resistant. No one can control the outcome other than by putting their money on the line.</p>
             </div>
           </div>
 
-          <div class="mx-auto text-center">
-            <h1 class="mx-auto my-0">What's the Best Strategy?</h1>
-            <div class="text-justify">
+          <div class="mx-auto text-left">
+            <h4 class="mx-auto">Why?</h4>
+            <div class="text-justify py-3">
+              <p><b>Truth staking is an attempt to restore media from the clutches of clickbait.</b></p>
+              <p>Since the advent of the internet, the cost of sharing information has rapidly been approaching zero. Information wants to be free, but it is not free to produce. As a result, most content producers now rely entirely on advertisers to earn a fair living. The ad-based economic model for information is rewarding clicks and views, not factual content. This incentivization structure has led to the downstream effect of clickbait, outrage, fake news, and creepy data collection. </p>
+              <p><b>Truth staking is a return to a freer, more transparent, peer-to-peer information economy.</b></p>
+            </div>
+          </div>
+
+          <div class="mx-auto text-left">
+            <h4 class="mx-auto">What's the Best Strategy?</h4>
+            <div class="text-justify py-3">
               <p>The game rewards peer-consensus. Because you don't know how your peers will behave, the best strategy is to stake honestly with what you believe to be true. Furthermore, it is in your best interest to research the claim, because that's what other players will be doing. From a game theory perspective, there is a <a href="https://en.wikipedia.org/wiki/Focal_point_(game_theory)">focal point</a> on the truth.</p>
             </div>
           </div>
-          
-          <a href="#live-stakes" class="btn btn-primary js-scroll-trigger">View Stakes</a>
+          <div class="col-md-4 offset-md-4">
+            <a href="/live-stakes.html" class="btn btn-primary js-scroll-trigger">View Live Stakes</a>
+          </div>
         </div>
       </div>
     </section>

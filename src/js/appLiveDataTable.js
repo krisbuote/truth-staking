@@ -92,8 +92,10 @@ App = {
 
 	render: function() {
 
-		$("#loader").show();
-	    $("#content").hide();
+	    $("#loader").show();
+	    $("#blockchain-content").hide();
+
+
 
 	    // Load account data
 	    web3.eth.getCoinbase(function(err, account) {
@@ -141,10 +143,6 @@ App = {
 			}
 
 		});
-
-
-		loader.hide();
-      	content.show();
 	
 	},
 
@@ -173,6 +171,7 @@ App = {
 	displayLiveDataTable: function() {
 
 		var liveStatementsData = [];
+		var liveEthSum = 0;
 
 		for (var i = 0; i < App.allStatementsArray.length; i++) {
 
@@ -184,44 +183,53 @@ App = {
 			var stakeEndTime = statement[3];
 			var marketMaker = statement[4];
 		 	var numStakes = statement[5];
-			var ethStaked = (statement[6] / 10**18).toFixed(3);
+			var ethStaked = ((statement[6] / 10**18).toFixed(3));
 			var stakeEnded = statement[7];
 			var statementSource = statement[8];
 
-			var timeRemainingSeconds = Math.floor(stakeEndTime - Date.now()/1000);
-
-			var cardHtml = App.collapsingCardHTMLformat(statementID, statementText, ethStaked, statementSource, stakeEndTime);
-			var ethStakedHtml = `<p class="display-4 text-center">${ethStaked}</p>`
+			
 
 			if (!stakeEnded) {
+				liveEthSum += Number(ethStaked);
+
+				var timeRemainingSeconds = stakeEndTime - Math.floor(Date.now()/1000);
+				var timeRemainingFormatted = App.secondsToDhm(timeRemainingSeconds);
+
+				var cardHtml = App.collapsingCardHTMLformatLiveData(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted);
+				var ethStakedHtml = `<p class="display-4 text-center">${ethStaked}</p>`
+
 				liveStatementsData.push([ethStakedHtml, cardHtml]);
 			}
 
+
 		}
 
-		console.log(liveStatementsData);
+		$("#liveNumStatements").html(liveStatementsData.length);
+		$("#liveEthStaked").html(liveEthSum.toFixed(3));
 
+		// Build Data table
 		$('#liveStatementTable').DataTable( {
 	        data: liveStatementsData,
 	        columns: [
 	            { title: "Sort by Value" },
-	            { title: "Sort by Recency"}  //TODO: Need to change html in collapsingCardHTMLformat() to data-order by recency
+	            { title: "Sort by Recency"} //TODO: Need to change html in collapsingCardHTMLformat() to data-order by recency
 	        ],
 	        "order": [[ 0, "desc" ]]
 	    });
 
 	    $("#loader").hide();
 	    $("#blockchain-content").show();
+
 	},
 
-	collapsingCardHTMLformat: function(statementID, statementText, ethStaked, statementSource, stakeEndTime) {
+	collapsingCardHTMLformatLiveData: function(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted, stakeEndTime) {
 
 		var html = `<td data-order="${stakeEndTime}">
 						<div class="card bg-transparent border-0 mb-3" id="card${statementID}">
 			                
 			                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
 			                    <button class="btn-default border-0 bg-light">
-			                      	<p class="font-weight-light">${statementText}</p>
+			                      	<p class="font-weight-light lead">${statementText}</p>
 			                    </button>
 			                </div>
 
@@ -230,43 +238,47 @@ App = {
 
 				                <div class="card-body text-center">
 
-				                  	<form method="POST" onSubmit="App.makeStake(${statementID}, stakePosition${statementID}, stakeValue${statementID}); return false;">
+									<form method="POST" onSubmit="App.makeStake(${statementID}, stakePosition${statementID}, stakeValue${statementID}); return false;">
 
 				                  		<div class="container">
 				                  			<div class="row">
-						                  		<div class="col-md-6 offset-md-3 text-center">
+						                  		<div class="col-md-6 offset-md-3">
 								                    <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
 													    <label button class="btn btn-truefalse btn-light">
-													    	<input type="radio" id="trueButton${statementID}" value="1" name="stakePosition${statementID}">True
+													    	<input type="radio" class="text-center" id="trueButton${statementID}" value="1" name="stakePosition${statementID}">True
 													    </label>
 													    <label button class="btn btn-truefalse btn-light">
-													    	<input type="radio" id="falseButton${statementID}" value="0" name="stakePosition${statementID}">False
+													    	<input type="radio" class="text-center" id="falseButton${statementID}" value="0" name="stakePosition${statementID}">False
 													    </label>
 													</div>
 												</div>
 											</div>
 										
 											<br/>
-											<div class="row">
-												<div class="col-md-8 offset-md-2 text-center">
-													<div class="input-group">
-													    <div class="input-group-prepend">
-													    	<span class="input-group-text text-monospace text-center" for="stakeValue${statementID}">Stake Amount:</span>
-													    </div>
-													  	<input class="text-center" type="number" id="stakeValue${statementID}" name="stakeValue${statementID}" placeholder="0.750 eth" step="0.001"/>
-													  	<span class="input-group-btn">
-													        <button class="btn btn-stake" type="submit">Stake</button>
-													    </span>
-													</div> 
+		
+
+
+										    <div class="form-group row">
+										    	<div class="col-md-4 offset-md-4">
+											    	<input class="text-center" type="number" id="stakeValue${statementID}" placeholder="0.750 ether" step="0.000001"/>
 												</div>
 											</div>
-										</div>
+											<div class="form-group row">
+												<div class="col-md-4 offset-md-4">
+													<button class="btn btn-stake text-center" type="submit">Stake</button>
+												</div>
+											</div>
 
-						            </form>
+										</div>
+									</form>
+
 						            <br/>
 
-				                  
-				                    <div class="statement-source text-center">
+
+				                  	<div class="text-center my-auto">
+				                    	<small class="text-muted">time remaining: ${timeRemainingFormatted}</small>
+				                   	</div>
+				                    <div class="text-center my-auto">
 				                    	<small class="text-muted">source: <a href="https://www.google.com/search?q=${statementSource}" target="_blank"> ${statementSource}</a></small>
 				                    </div>
 
@@ -283,19 +295,40 @@ App = {
 
 	},
 
+	makeNewStatement: function(_newStatementString, _newStatementPosition, _newStatementStakingPeriod, _newStatementSource, _newStatementStakeValue) {
 
-	makeNewStatement: function() {
-		var newStatementString = $("#newStatementString").val();
-		var newStatementPosition = $("#newStatementPosition").val();
-		var newStatementStakingPeriod = $("#newStatementStakingPeriod").val();
-		var newStatementSource = $("#newStatementSource").val();
-		var newStatementStakeValue = $("#newStatementStakeValue").val();
+		var newStatementString = _newStatementString.value;
+		var newStatementPosition = _newStatementPosition.value;
+		var newStatementStakingPeriod = Math.floor(_newStatementStakingPeriod.value*24*60*60); //convert days to seconds
+		var newStatementSource = _newStatementSource.value;
+		var newStatementStakeValue = _newStatementStakeValue.value;
 
-		console.log(newStatementString);
+		if (!newStatementSource){	
+			newStatementSource = "none";
+		}
 
-		if (!newStatementString || !newStatementPosition || !newStatementStakingPeriod || !newStatementSource || !newStatementStakeValue){	
+		if (!newStatementStakingPeriod) {
+			newStatementStakingPeriod = 7*24*60*60 // default to 7 days 
+		}
+
+
+		if (!App.account) {
+	    	alert("Please sign into MetaMask and refresh the page.");
+	    }
+
+		else if (!newStatementString){	
 			console.log("Please complete the form.");
-			alert("You must complete the form first.");
+			alert("You must enter the statement first.");
+		}
+
+		else if (!newStatementPosition){	
+			console.log("Please complete the form.");
+			alert("You must choose true or false.");
+		}
+
+		else if (!newStatementStakeValue){	
+			console.log("Please complete the form.");
+			alert("You must enter the initial stake.");
 		}
 
 		else {
@@ -308,8 +341,8 @@ App = {
 			var contractInstance = App.truthStakingContract.at(contractAddress);
 			contractInstance.newStatement(newStatementString, newStatementPosition, newStatementStakingPeriod, newStatementSource, txObject, function(err, result) {
 				if(!err) {
-					alert("Success! It will take some time to appear on the blockchain.");
-					console.log("makeNewStatement success! new statementID: ", result);
+					alert("Success!");
+					console.log("makeNewStatement success! tx hash:", result);
 				}
 				else {
 					console.error(err);
@@ -321,30 +354,20 @@ App = {
 	},
 
 	makeStake: function(_statementID, _stakePosition, _stakeValue) {
-	    // var statementIdToStake = $("#statementIdToStake").val()
 	    var statementIdToStake = _statementID;
-	    console.log('sid', statementIdToStake);
 	    var stakePosition = _stakePosition.value;
-	    console.log('stake pos', stakePosition);
-
-	    // positionTrue = $("#trueButton" + statementIdToStake.toString()).val();
-	    // positionFalse = $("#falseButton" + statementIdToStake.toString()).val();
-	    // console.log('true val:', positionTrue);
-	    // console.log('false val:', positionFalse)
-	    // var position = $("#positionSelect").val();
-	    // var stakeValue = $("#stakeValue").val();
-
 	    var stakeValue = _stakeValue.value;
-	    console.log('stakeValue: ', stakeValue)
-	    // console.log(statementIdToStake, stakePosition, stakeValue);
 
-
-	    if (!stakeValue) {
-			alert("Please set the stake amount.");
-	    }
-	    console.log(App.account);
 	    if (!App.account) {
-	    	alert("Please sign into MetaMask and refresh.");
+	    	alert("Please sign into MetaMask and refresh the page.");
+	    }
+
+	    else if (!stakePosition) {
+	    	alert("Please choose True or False.")
+	    }
+
+	    else if (!stakeValue) {
+			alert("Please set the stake amount.");
 	    }
 
 	    else {
@@ -356,24 +379,44 @@ App = {
 			var contractInstance = App.truthStakingContract.at(contractAddress);
 		    contractInstance.stake.sendTransaction(statementIdToStake, stakePosition, txObject, function(error, result) {
 		    	if(!error) {
-		    		console.log(result);
-		    		alert("Successful stake! It will take some time to appear on the blockchain.");
-
+		    		console.log('makeStake() success: ',result);
+		    		App.successTxHash(result);
 		    	}
 
 		    	else {
-
-		    		alert("Transaction failed. Please check if the staking period is over.")
+		    		alert("Transaction failed.");
+		    		console.error("makeStake() failed");
 		    		console.error(error);
-
-		    		// TODO: Include transaction error explanations: stake over, not enough ether sent, invalid statementId, invalid stakePosition
 		    	}
 
 		    });
 
 	    }
 
-    }
+    },
+
+
+
+    secondsToDhm: function(seconds) {
+	seconds = Number(seconds);
+	var d = Math.floor(seconds / (3600*24));
+	var h = Math.floor(seconds % (3600*24) / 3600);
+	var m = Math.floor(seconds % 3600 / 60);
+	var s = Math.floor(seconds % 3600 % 60);
+
+	var dDisplay = d > 0 ? d + "d:" : "";
+	var hDisplay = h > 0 ? h + "h:" : "";
+	var mDisplay = m > 0 ? m + "m" : "";
+
+	return dDisplay + hDisplay + mDisplay;
+	
+	},
+
+	successTxHash: function(tx) {
+		var s = "Success! tx hash: " + String(tx);
+		alert(s);
+	}
+
 
 
 
@@ -389,36 +432,9 @@ function wait(ms){
   }
 }
 
-// // Keep card stake collapse open
-// $('.card').click(function(e) {
-//   if (
-//     $(this)
-//       .find('.collapse')
-//       .hasClass('show')
-//   ) {
-//     e.stopPropagation();
-//   }
-// });
-
-
-
 $(function() {
   $(window).on("load", function() {
     App.init();
   });
 });
-
-// $(document).ready(function() {
-// 	console.log(allStatementsArray);
-//     $('#statementTable').DataTable( {
-// 	        data: allStatementsArray,
-// 	        columns: [
-// 	            { title: "eth" },
-// 	            { title: "statement" },
-// 	            { title: "time remaining"}
-
-// 	        ]
-// 	    });
-
-// });
 

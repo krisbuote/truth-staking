@@ -20,8 +20,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
     <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"> -->
 
-    <!-- Kris' Grayscale -->
-    <link href="css/kris-grayscale.css" rel="stylesheet">
+    <!-- Custom Grayscale -->
+    <link href="css/custom-grayscale.css" rel="stylesheet">
 
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -49,13 +49,16 @@
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-              <a class="nav-link js-scroll-trigger" href="/about.html">About</a>
-            </li>
-            <li class="nav-item">
               <a class="nav-link js-scroll-trigger" href="/live-stakes.html">Stakes</a>
             </li>
             <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="/past-stakes.html">History</a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link js-scroll-trigger" href="#new-claim">New Claim</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="/about.html">About</a>
             </li>
           </ul>
         </div>
@@ -67,14 +70,11 @@
       <div class="container d-flex h-100 align-items-center">
         <div class="mx-auto text-center">
           <h1 class="mx-auto my-0 text-uppercase">Truth Staking</h1>
-          <div class="text-center my-5">
-            <h3 id="absEthStaked"></h3>
-            <h4 class="font-weight-light text-white-50">eth staked on</h4>
-            <h3 id="absNumStatements"></h3>
-            <h4 class="font-weight-light text-white-50">claims</h4>
-          </div>
+          <h2 class="text-white-50 mx-auto mt-2 mb-5">crowdsourcing the truth</h2>
+
+
           <div>
-            <a href="#about" class="btn btn-primary js-scroll-trigger">Get Started</a>
+            <a href="#about" class="btn btn-primary js-scroll-trigger">Learn More</a>
           </div>
         </div>
       </div>
@@ -84,11 +84,18 @@
     <!-- About Section -->
     <section id="about" class="about-section text-center">
       <div class="container">
+
         <div class="row">
           <div class="col-lg-8 mx-auto">
-            <h2 class="text-white mb-4">Crowdsourcing the Truth</h2>
             <h2 class="text-white mb-4">Seek the Truth, Reap the Rewards</h2>
-            <p class="text-white">Stake ether on claims made in the media. If your peers agree with you, you win.</p>
+
+            <div class="text-center my-5">
+              <h3 id="absEthStaked"></h3>
+              <h4 class="font-weight-light text-white-50">eth staked on</h4>
+              <h3 id="absNumStatements"></h3>
+              <h4 class="font-weight-light text-white-50">claims</h4>
+            </div>
+            <p class="text-white">Stake ether on claims made by the media. If your peers agree with you, you win.</p>
             <p class="text-white">Larger stakes earn bigger rewards.</p>
             <a href="#live-stakes" class="btn btn-primary js-scroll-trigger">View Stakes</a>
           </div>
@@ -98,8 +105,8 @@
     </section>
 
     <!-- Loading -->
-    <div id="loader">
-      <p class="text-center">Contacting blockchain...</p>
+    <div id="loader" class="blockchain-loader bg-light">
+      <p class="text-center bg-light">Contacting blockchain...</p>
     </div>   
     
     <div id="blockchain-content">
@@ -108,17 +115,17 @@
         <div class="container">
 
           <!-- Live Stakes -->  
-          <div id="live-stakes" class="live-stakes">
+          <div id="live-stakes" class="live-stakes text-center">
             <div id="liveStatementsAccordion">
-              <h3 class="text-center display-4">Live Stakes</h3>
-              <p class="text-center text-muted">click on a statement to stake</p>
+              <h3 class="display-4">Live Stakes</h3>
+              <p class="text-muted">click on a statement to stake</p>
               <hr/>
 
               <div id="popularLiveStakesCards">
             </div>
             <br/>
 
-            <div class="text-center">
+            <div>
               <a href="./live-stakes.html" class="btn btn-secondary">See all live stakes </a>
             </div>
           </div>
@@ -129,15 +136,15 @@
       <section id="past-stakes" class="stakes-section bg-light">
         <div class="container">
           <!-- Past Stakes -->
-          <div id="past-stakes" class="past-stakes">
+          <div id="past-stakes" class="past-stakes text-center">
             <div id="pastStatementsAccordion">
-              <h3 class="text-center display-4">Past Stakes</h3>
-              <p class="text-center text-muted">view the results of past stakes</p>
+              <h3 class="display-4">Past Stakes</h3>
+              <p class="text-muted">view the results of past stakes</p>
               <div id="popularPastStakesCards">
             </div>
           
             <br/>
-            <div class="text-center">
+            <div>
               <a href="./past-stakes.html" class="btn btn-secondary">See all past stakes </a>
             </div>
           </div>
@@ -174,7 +181,7 @@
             <div class="form-group row">
               <label for="newStatementStakeValue" class="col-3 col-form-label"">First Stake: </label>
               <div class="col-2">
-                <input class="form-control text-center" type="number" id="newStatementStakeValue" placeholder="0.750 ether" step="0.000000000000000001"/>
+                <input class="form-control text-center" type="number" id="newStatementStakeValue" placeholder="0.750 ether" step="0.000001"/>
               </div>
             </div>
             <div class="form-group row">

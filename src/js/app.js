@@ -165,70 +165,6 @@ App = {
 	},
 
 
-	getStatementDataAndBuildLiveTable: function(_index, _numStatements, _contractInstance) {
-		// Queries blockchain for statement data
-
-		_contractInstance.statements(_index, function(error, statement) {
-
-			if(!error){	
-
-				
-				App.allStatementsArray.push(statement); // Push full statement array to array
-
-				if (App.allStatementsArray.length == _numStatements) {
-					App.displayLiveDataTable(); // If all statements collected, build data table
-					// App.displayPastDataTable();
-				}
-			}
-
-			else{console.error(error)}
-
-		});
-
-
-	},
-
-	displayLiveDataTable: function() {
-
-		var liveStatementsData = [];
-
-		for (var i = 0; i < App.allStatementsArray.length; i++) {
-
-			var statement = App.allStatementsArray[i];
-
-		  	var statementID = statement[0];
-			var statementText = statement[1];
-			var stakeDuration = statement[2];
-			var stakeEndTime = statement[3];
-			var marketMaker = statement[4];
-		 	var numStakes = statement[5];
-			var ethStaked = (statement[6] / 10**18).toFixed(3);
-			var stakeEnded = statement[7];
-			var statementSource = statement[8];
-
-			var timeRemainingSeconds = Math.floor(stakeEndTime - Date.now()/1000);
-
-			var cardHtml = App.collapsingCardHTMLformat(statementID, statementText, ethStaked, statementSource, stakeEndTime);
-			var ethStakedHtml = `<p class="display-4 text-center">${ethStaked}</p>`
-
-			if (!stakeEnded) {
-				liveStatementsData.push([ethStakedHtml, cardHtml]);
-			}
-
-		}
-
-		console.log(liveStatementsData);
-
-		$('#statementTable').DataTable( {
-	        data: liveStatementsData,
-	        columns: [
-	            { title: "Sort by Value" },
-	            { title: "Sort by Recency"}  //TODO: Need to change html in collapsingCardHTMLformat() to data-order by recency
-	        ]
-	    });
-	},
-
-
 	getStatementDataAndDisplayPopularStakes: function(_index, _numStatements, _contractInstance) {
 		// Queries blockchain for statement data
 
@@ -304,7 +240,10 @@ App = {
 			var stakeEnded = statement[7];
 			var statementSource = statement[8];
 
-			var html = App.collapsingCardHTMLformatLiveData(statementID, statementText, ethStaked, statementSource, stakeEndTime);
+			var timeRemainingSeconds = stakeEndTime - Math.floor(Date.now()/1000);
+			var timeRemainingFormatted = App.secondsToDhm(timeRemainingSeconds);
+
+			var html = App.collapsingCardHTMLformatLiveData(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted);
 
 			popularLiveStakesCards.append(html);
 
@@ -334,6 +273,7 @@ App = {
 
 			var html = App.collapsingCardHTMLformatPastData(statementID, statementText, ethStaked, statementSource, stakeEndTime, verdict);
 
+
 			popularPastStakesCards.append(html);
 
 
@@ -344,57 +284,8 @@ App = {
 
 	},
 
-	findIndicesOfMaxInArray: function(arr, n) {
-		var maxi_array = [];
 
-		for(let i=0; i<n; i++){
-			var max = Math.max.apply(null, arr), // get the max of the array
-	        maxi = arr.indexOf(max); // find index of max
-	        maxi_array.push(maxi); //place max indices in array
-		    arr[maxi] = -Infinity; // replace max in the array with -infinity
-		}
-
-	    return maxi_array;
-	},
-
-	// displayPastDataTable: function() {
-
-	// 	var pastStatementsData = [];
-
-	// 	for (var i = 0; i < App.allStatementsArray.length; i++) {
-
-	// 		var statement = App.allStatementsArray[i];
-
-	// 	  	var statementID = statement[0];
-	// 		var statementText = statement[1];
-	// 		var stakeDuration = statement[2];
-	// 		var stakeEndTime = statement[3];
-	// 		var marketMaker = statement[4];
-	// 	 	var numStakes = statement[5];
-	// 		var ethStaked = (statement[6] / 10**18).toFixed(3);
-	// 		var stakeEnded = statement[7];
-	// 		var statementSource = statement[8];
-
-	// 		var cardHtml = App.collapsingCardHTMLformat(statementID, statementText, ethStaked, statementSource);
-
-	// 		if (stakeEnded) {
-	// 			pastStatementsData.push([stakeEndTime, cardHtml]);
-	// 		}
-
-	// 	}
-
-	// 	console.log(pastStatementsData);
-
-	// 	$('#statementTable').DataTable( {
-	//         data: pastStatementsData,
-	//         columns: [
-	//             { title: "Recency" },
-	//             { title: "Eth"}
-	//         ]
-	//     });
-	// },
-
-	collapsingCardHTMLformatLiveData: function(statementID, statementText, ethStaked, statementSource, stakeEndTime) {
+	collapsingCardHTMLformatLiveData: function(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted) {
 
 		var html = `<div class="card bg-transparent border-0 mb-3" id="card${statementID}">
 		                
@@ -406,7 +297,7 @@ App = {
 		                </div>
 
 
-		                <div class="card-body collapse" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}" data-parent="#liveStatementsAccordion">
+		                <div class="card-body collapse" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}">
 
 			                <div class="card-body text-center">
 
@@ -414,41 +305,45 @@ App = {
 
 			                  		<div class="container">
 			                  			<div class="row">
-					                  		<div class="col-md-6 offset-md-3 text-center">
+					                  		<div class="col-md-6 offset-md-3">
 							                    <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
 												    <label button class="btn btn-truefalse btn-light">
-												    	<input type="radio" id="trueButton${statementID}" value="1" name="stakePosition${statementID}">True
+												    	<input type="radio" class="text-center" id="trueButton${statementID}" value="1" name="stakePosition${statementID}">True
 												    </label>
 												    <label button class="btn btn-truefalse btn-light">
-												    	<input type="radio" id="falseButton${statementID}" value="0" name="stakePosition${statementID}">False
+												    	<input type="radio" class="text-center" id="falseButton${statementID}" value="0" name="stakePosition${statementID}">False
 												    </label>
 												</div>
 											</div>
 										</div>
 									
 										<br/>
-										<div class="row">
-											<div class="col-md-8 offset-md-2 text-center mb-3">
-												<div class="input-group">
-												    <div class="input-group-prepend">
-												    	<span class="input-group-text text-monospace text-center" for="stakeValue${statementID}">Stake Amount:</span>
-												    </div>
-												  	<input class="text-center form-control" type="number" id="stakeValue${statementID}" name="stakeValue${statementID}" placeholder="0.750 eth" step="0.001"/>
-												  	<div class="input-group-append">
-												        <button class="btn btn-stake" type="submit">Stake</button>
-												    </div>
-												</div> 
+	
+
+
+									    <div class="form-group row">
+									    	<div class="col-md-4 offset-md-4">
+										    	<input class="form-control text-center" type="number" id="stakeValue${statementID}" placeholder="0.750 ether" step="0.000001"/>
 											</div>
 										</div>
+										<div class="form-group row">
+											<div class="col-md-4 offset-md-4">
+												<button class="btn btn-stake text-center" type="submit">Stake</button>
+											</div>
+										</div>
+
 									</div>
 
 					            </form>
 					            <br/>
 
-			                  
-			                    <div class="statement-source text-center">
+			                  	<div class="text-center my-auto">
+			                    	<small class="text-muted">time remaining: ${timeRemainingFormatted}</small>
+			                   	</div>
+			                    <div class="text-center my-auto">
 			                    	<small class="text-muted">source: <a href="https://www.google.com/search?q=${statementSource}" target="_blank"> ${statementSource}</a></small>
 			                    </div>
+
 
 			                </div>
 
@@ -463,40 +358,39 @@ App = {
 	},
 
 	collapsingCardHTMLformatPastData: function(statementID, statementText, ethStaked, statementSource, stakeEndTime, verdict) {
-		var html = `<div class="card bg-light border-0 mb-3" id="card${statementID}">
+		var html = `<div class="card bg-transparent border-0 mb-3" id="card${statementID}">
+		                
 		                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
-		                    <button class="card-btn bg-light" >
-		                    	<abbr class="lead">${ethStaked} eth</abbr>
+		                    <button class="btn-default border-0 bg-light">
+		                    	<abbr class="text-center lead text-primary">${ethStaked} eth</abbr>
 		                      	<p class="font-weight-light">${statementText}</p>
 		                      	<p class="font-weight-light">Verdict: ${verdict}</p>
 		                    </button>
 		                </div>
 
 
-
-		                <div class="card-body collapse" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}" data-parent="#pastStatementsAccordion">
+		                <div class="card-body collapse" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}">
 
 			                <div class="card-body text-center">
-			                  
-			                    <div class="statement-source text-center">
+
+			                
+					            <br/>
+			                    <div class="text-center my-auto">
 			                    	<small class="text-muted">source: <a href="https://www.google.com/search?q=${statementSource}" target="_blank"> ${statementSource}</a></small>
 			                    </div>
-
-			                    <div>
-			                    	<button type="button" class="btn btn-link btn-lg mt-0 float-right">
-									  <a href="./about.html" class="fas fa-info-circle"></a>
-									</button>
-								</div>
 
 
 			                </div>
 
+		            	<hr/>
 
 		                </div>
+
 		            </div>`
 
 		return html
 	},
+
 
 	makeNewStatement: function(_newStatementString, _newStatementPosition, _newStatementStakingPeriod, _newStatementSource, _newStatementStakeValue) {
 
@@ -506,10 +400,8 @@ App = {
 		var newStatementSource = _newStatementSource.value;
 		var newStatementStakeValue = _newStatementStakeValue.value;
 
-		console.log(newStatementString, newStatementPosition, newStatementStakingPeriod, newStatementSource, newStatementStakeValue);
-
 		if (!newStatementSource){	
-			newStatementSource = "";
+			newStatementSource = "none";
 		}
 
 		if (!newStatementStakingPeriod) {
@@ -546,7 +438,7 @@ App = {
 			var contractInstance = App.truthStakingContract.at(contractAddress);
 			contractInstance.newStatement(newStatementString, newStatementPosition, newStatementStakingPeriod, newStatementSource, txObject, function(err, result) {
 				if(!err) {
-					alert("Success! It will take some time to appear on the blockchain.");
+					alert("Success!");
 					console.log("makeNewStatement success! tx hash:", result);
 				}
 				else {
@@ -559,22 +451,9 @@ App = {
 	},
 
 	makeStake: function(_statementID, _stakePosition, _stakeValue) {
-	    // var statementIdToStake = $("#statementIdToStake").val()
 	    var statementIdToStake = _statementID;
-	    console.log('sid', statementIdToStake);
 	    var stakePosition = _stakePosition.value;
-	    console.log('stake pos', stakePosition);
-
-	    // positionTrue = $("#trueButton" + statementIdToStake.toString()).val();
-	    // positionFalse = $("#falseButton" + statementIdToStake.toString()).val();
-	    // console.log('true val:', positionTrue);
-	    // console.log('false val:', positionFalse)
-	    // var position = $("#positionSelect").val();
-	    // var stakeValue = $("#stakeValue").val();
-
 	    var stakeValue = _stakeValue.value;
-	    console.log('stakeValue: ', stakeValue)
-	    // console.log(statementIdToStake, stakePosition, stakeValue);
 
 	    if (!App.account) {
 	    	alert("Please sign into MetaMask and refresh the page.");
@@ -597,24 +476,53 @@ App = {
 			var contractInstance = App.truthStakingContract.at(contractAddress);
 		    contractInstance.stake.sendTransaction(statementIdToStake, stakePosition, txObject, function(error, result) {
 		    	if(!error) {
-		    		console.log(result);
-		    		alert("Successful stake! It will take some time to appear on the blockchain.");
-
+		    		console.log('makeStake() success: ',result);
+		    		App.successTxHash(result);
 		    	}
 
 		    	else {
-
-		    		alert("Transaction failed. Please check if the staking period is over.")
+		    		alert("Transaction failed.");
+		    		console.error("makeStake() failed");
 		    		console.error(error);
-
-		    		// TODO: Include transaction error explanations: stake over, not enough ether sent, invalid statementId, invalid stakePosition
 		    	}
 
 		    });
 
 	    }
 
-    }
+    },
+
+    findIndicesOfMaxInArray: function(arr, n) {
+		var maxi_array = [];
+
+		for(let i=0; i<n; i++){
+			var max = Math.max.apply(null, arr), // get the max of the array
+	        maxi = arr.indexOf(max); // find index of max
+	        maxi_array.push(maxi); //place max indices in array
+		    arr[maxi] = -Infinity; // replace max in the array with -infinity
+		}
+
+	    return maxi_array;
+	},
+
+    secondsToDhm: function (seconds) {
+		seconds = Number(seconds);
+		var d = Math.floor(seconds / (3600*24));
+		var h = Math.floor(seconds % (3600*24) / 3600);
+		var m = Math.floor(seconds % 3600 / 60);
+		var s = Math.floor(seconds % 3600 % 60);
+
+		var dDisplay = d > 0 ? d + "d:" : "";
+		var hDisplay = h > 0 ? h + "h:" : "";
+		var mDisplay = m > 0 ? m + "m" : "";
+
+		return dDisplay + hDisplay + mDisplay;
+	},
+
+	successTxHash: function(tx) {
+		var s = "Success! tx hash: " + String(tx);
+		alert(s);
+	}
 
 
 
@@ -630,16 +538,6 @@ function wait(ms){
   }
 }
 
-// // Keep card stake collapse open
-// $('.card').click(function(e) {
-//   if (
-//     $(this)
-//       .find('.collapse')
-//       .hasClass('show')
-//   ) {
-//     e.stopPropagation();
-//   }
-// });
 
 $(function() {
   $(window).on("load", function() {
