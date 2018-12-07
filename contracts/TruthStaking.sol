@@ -39,17 +39,10 @@ contract TruthStaking {
 	}
 
 	// Create a pot that tracks Ether staked on True (T) vs. False (F)
-	// Must keep sub-pots private, but totalPot value should be public
 	struct Pot {
-		uint total;
 		uint T;
 		uint F;
 		//////////// TODO: Store stakes in here with position/amount . Private!
-	}
-
-	struct Beneficiary {
-		address benAddr;
-		uint potProportionTenThousandths;
 	}
 
 
@@ -59,7 +52,7 @@ contract TruthStaking {
 	mapping(uint => Pot) private pots;  /////////// TODO: Put pot mapping in statement too?
 	mapping(address => uint) public beneficiaryShares;
 
-	address[] private beneficiaryAddresses;
+	address[] public beneficiaryAddresses;
 
 	////////////////////// STATE VARIABLES //////////////////////
 
@@ -94,7 +87,8 @@ contract TruthStaking {
 	event StatementIDCheck(uint statementID); /// CHECK
 	event RewardCheck(uint rewardTransfered);
 	event ProfitCheck(uint profitCalculated);
-	event PotsCheck(uint TPotValue, uint FPotValue);
+	event PotsCheck(uint winningPot, uint potRemaining);
+	event FeeCheck(uint feeWei);
 
 
 	// Constructor executes once when contract is created
@@ -156,11 +150,6 @@ contract TruthStaking {
 		// Map Stake with statement AND THEN add one to numStakes
 		s.stakes[s.numStakes++] = Stake({addr:msg.sender, amount:msg.value, position:_position});
 
-
-
-
-		///// KRIS. it doesn't appear this has an effect on stakeEndTime ?
-
 		// If it is near the end of the stake and someone stakes a large amount, time is added.
 		uint pctTimeRemaining = 100 * (s.stakeEndTime - now) / (s.stakeDuration);
 
@@ -171,11 +160,11 @@ contract TruthStaking {
 		    
 		    if (percentOfCurrentPot > minPotPctThreshold) {
 		        
-    			// extraTime = stakeDuration * size of stake * time added per stake size ratio
+    			// extraTime = stakeDuration * size of stake * time added per stake size ratio. More generally, extraTime = time * x * slope
     			uint extraTimeRaw = s.stakeDuration * (percentOfCurrentPot - minPotPctThreshold) * (maxTimeAddPct - minTimeAddPct) / (maxPotPctThreshold - minPotPctThreshold) / 100;
     
     			// Cap the amount of extra time added.
-    			uint extraTime = Math.min(extraTimeRaw, s.stakeDuration * maxPotPctThreshold / 100);
+    			uint extraTime = Math.min(extraTimeRaw, s.stakeDuration * maxTimeAddPct / 100);
     
     			// Add time to the stake
     			s.stakeEndTime += extraTime;
@@ -185,23 +174,21 @@ contract TruthStaking {
 
 		// Update Statement value
 		s.ethStaked += msg.value;
-
-		// Add the stake to total pot
 		emit NewStake(_statementID, msg.value);
-		addToPot(msg.value, _position, _statementID);
 
 		// Add to global trackers
 		absNumStakes++;
 		absEthStaked += msg.value;
+
+		// Add the stake to total pot
+		addToPot(msg.value, _position, _statementID);
 
 	}
 
 	function addToPot(uint _amount, uint _position, uint _statementID) private {
 
 		Pot storage p = pots[_statementID];
-		p.total += _amount;
 
-		/// TODO: Consider using bool _position , not uint /// 
 		if (_position == 1) {
 			p.T += _amount;
 		}
@@ -209,7 +196,7 @@ contract TruthStaking {
 			p.F += _amount;
 		}
 
-		emit CurrentPot(_statementID, p.total);
+		emit CurrentPot(_statementID, p.T + p.F);
 
 	}
 
@@ -220,6 +207,7 @@ contract TruthStaking {
 
 		// 1. Conditions
 		// Require that sufficient time has passed and endStake has not already been called
+		require(_statementID < absNumStatements, "Invalid statementID");
 		require(now >= s.stakeEndTime, "There is still staking time remaining.");
 		require(!s.stakeEnded, "endStake has already been called.");
 
@@ -244,7 +232,6 @@ contract TruthStaking {
 		// TODO storage or memory?
 		Statement storage s = statements[_statementID];
 		Pot storage p = pots[_statementID];
-		emit CurrentPot(_statementID, p.total);
 
 
 		if (p.T >= p.F) {
@@ -260,6 +247,7 @@ contract TruthStaking {
 			s.verdict = 0;
 		}
 
+		emit PotsCheck(winningPot, losingPot);
 
 		// Emit the total pot value and winning position at end of stake
 		emit StakeEnded(_statementID,  p.T, p.F, winningPosition, s.numStakes);
@@ -268,27 +256,34 @@ contract TruthStaking {
 		uint fee = losingPot * serviceFeeTenThousandths / 10000;
 		uint potRemaining = losingPot - fee;
 
+		emit FeeCheck(fee);
+		emit PotsCheck(winningPot, potRemaining);
+
 		// Beneficiaries 
 		for (uint i = 0; i < beneficiaryAddresses.length; i++) {
 			address beneficiary = beneficiaryAddresses[i];
 			beneficiary.transfer(losingPot * beneficiaryShares[beneficiary] / 10000);
 			potRemaining -= losingPot * beneficiaryShares[beneficiary] / 10000;
+			emit PotsCheck(winningPot, potRemaining);
 		}
 
-		//Reward marketMaker two times
-		uint marketMakerReward = s.stakes[0].amount + (potRemaining * s.stakes[0].amount / winningPot);
+		// Reward marketMaker two times
+		uint marketMakerReward = potRemaining * s.stakes[0].amount / (winningPot + potRemaining);
+		emit RewardCheck(marketMakerReward);
+
 		s.stakes[0].addr.transfer(marketMakerReward);
 
 		potRemaining -= marketMakerReward;
+		emit PotsCheck(winningPot, potRemaining);
+
 		
 		// Stakers Rewards
 		for (uint j = 0; j < s.numStakes; j++) {
 
-			// emit LoopCheck(j);
-
-			// If the staker's position matched the majority
-			// They receive their original stake + proportion of loser's stakes
+			// If the staker's position matched the majority, they receive their original stake + proportion of loser's stakes
 			if (s.stakes[j].position == winningPosition) {
+
+				emit CorrectStake(_statementID, s.stakes[j].addr, s.stakes[j].amount, s.stakes[j].position);
 
 				// Calculate profit for correct staker
 				profit = potRemaining * s.stakes[j].amount / winningPot;
@@ -307,6 +302,7 @@ contract TruthStaking {
 
 		owner.transfer(fee);
 
+
 	}
 
 
@@ -319,7 +315,7 @@ contract TruthStaking {
 		serviceFeeTenThousandths = _newServiceFeeTenThousandths;
 	}
 
-	function setBeneficiaryCutTenThousandths(address _beneficiaryAddress, uint _potProportionTenThousandths) public onlyOwner {
+	function setBeneficiaryShareTenThousandths(address _beneficiaryAddress, uint _potProportionTenThousandths) public onlyOwner {
 		// _potProportionTenThousandths should be desired percentage * 100.
 		// e.g. if a pot cut of 0.35% is desired, _potProportionTenThousandths = 35
 		require(_potProportionTenThousandths >= 0, 'Beneficiary cut cannot be less than 0%.');
@@ -328,6 +324,15 @@ contract TruthStaking {
 		beneficiaryShares[_beneficiaryAddress] = _potProportionTenThousandths;
 
 		// TODO: Test you can set address cut back to zero
+	}
+
+	function removeBeneficiary(uint _index, address _beneficiaryAddress) public onlyOwner {
+		require(_beneficiaryAddress == beneficiaryAddresses[_index], "The beneficiary address must match beneficiaryAddresses[index].");
+		beneficiaryShares[_beneficiaryAddress] = 0; // set beneficiary shares to 0
+		delete beneficiaryAddresses[_index]; // remove the beneficiary
+		beneficiaryAddresses[_index] = beneficiaryAddresses[beneficiaryAddresses.length - 1]; // replace the empty spot with most recently added
+		delete beneficiaryAddresses[beneficiaryAddresses.length - 1]; // delete the redundant copy
+
 	}
 
 	function setAddTimeParameters(uint _newPctTimeRemainingThreshold, 
@@ -346,6 +351,14 @@ contract TruthStaking {
 
 	function transferOwnership(address _newOwner) public onlyOwner {
 		owner = _newOwner;
+	}
+
+	function SELF_DESTRUCT(string _confirm) public onlyOwner {
+			
+		if (keccak256(_confirm) == keccak256('Yes, I really want to destroy this contract forever.')) {
+			selfdestruct(owner);
+		}
+
 	}
 
 }
