@@ -54,7 +54,6 @@ App = {
 			if (!error) {
 				// Do something
 				console.log(result);
-				console.log(" stakeEvent 1 success");
 				var statementID = result.args.statementID;
 			}
 			else {
@@ -69,7 +68,6 @@ App = {
 				// Do something
 				var statementID = result.args.statementID;
 				var statementText = result.args.statement;
-				console.log("newStatementEvent WORKED! statementID: ", statementID);
 			}
 			else {
 				console.error(err);
