@@ -315,13 +315,13 @@ contract TruthStaking {
 		serviceFeeTenThousandths = _newServiceFeeTenThousandths;
 	}
 
-	function setBeneficiaryShareTenThousandths(address _beneficiaryAddress, uint _potProportionTenThousandths) public onlyOwner {
+	function addBeneficiary(address _beneficiaryAddress, uint _beneficiaryShareTenThousandths) public onlyOwner {
 		// _potProportionTenThousandths should be desired percentage * 100.
 		// e.g. if a pot cut of 0.35% is desired, _potProportionTenThousandths = 35
-		require(_potProportionTenThousandths >= 0, 'Beneficiary cut cannot be less than 0%.');
-		require(_potProportionTenThousandths <= 10000, 'Beneficiary cut cannot be greater than 100%.');
+		require(_beneficiaryShareTenThousandths >= 0, 'Beneficiary cut cannot be less than 0%.');
+		require(_beneficiaryShareTenThousandths <= 10000, 'Beneficiary cut cannot be greater than 100%.');
 		beneficiaryAddresses.push(_beneficiaryAddress);
-		beneficiaryShares[_beneficiaryAddress] = _potProportionTenThousandths;
+		beneficiaryShares[_beneficiaryAddress] = _beneficiaryShareTenThousandths;
 
 		// TODO: Test you can set address cut back to zero
 	}
