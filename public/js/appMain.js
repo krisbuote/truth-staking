@@ -245,13 +245,15 @@ App = {
 			                  		<div class="container">
 			                  			<div class="row">
 					                  		<div class="col-md-6 offset-md-3">
-							                    <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
-												    <label button class="btn btn-truefalse btn-light">
-												    	<input type="radio" class="text-center" id="trueButton${statementID}" value="1" name="stakePosition${statementID}">True
-												    </label>
-												    <label button class="btn btn-truefalse btn-light">
-												    	<input type="radio" class="text-center" id="falseButton${statementID}" value="0" name="stakePosition${statementID}">False
-												    </label>
+					                  			<div class="text-center">
+								                    <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
+													    <label button class="btn btn-truefalse btn-light">
+													    	<input type="radio" class="text-center" id="trueButton${statementID}" value="1" name="stakePosition${statementID}">True
+													    </label>
+													    <label button class="btn btn-truefalse btn-light">
+													    	<input type="radio" class="text-center" id="falseButton${statementID}" value="0" name="stakePosition${statementID}">False
+													    </label>
+													</div>
 												</div>
 											</div>
 										</div>

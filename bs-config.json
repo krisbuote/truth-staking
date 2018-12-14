@@ -1,5 +1,6 @@
 {
   "server": {
-    "baseDir": ["./src", "./build/contracts"]
-  }
+    "baseDir": ["./public/", "./build/contracts"],
+	"startPath": "./public/index.html"
+	}
 }

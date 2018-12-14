@@ -129,7 +129,7 @@
           <!-- Past Stakes -->
           <div id="past-stakes" class="past-stakes text-center">
             <div id="pastStatementsAccordion">
-              <h3 class="display-4">Past Stakes</h3>
+              <h3 class="display-4 text-center">Past Stakes</h3>
               <p class="text-muted">view the results of past stakes</p>
               <div id="popularPastStakesCards">
             </div>
@@ -154,12 +154,12 @@
         <form onSubmit="App.makeNewStatement(newStatementString, newStatementPosition, newStatementStakingPeriod, newStatementSource, newStatementStakeValue); return false;">
           <div class="text-right">
             <div class="form-group row">
-              <label for="newStatementString" class="col-3 col-form-label">Paste new statement: </label>
-              <textarea class="form-control col-9" id="newStatementString" rows="2"></textarea>
+              <label for="newStatementString" class="col-sm-3 col-form-label">Paste new statement: </label>
+              <textarea class="form-control col-sm-9" id="newStatementString" rows="2"></textarea>
               <!-- <input type="text" class="form-control" id="newStatementString" placeholder="This sentence is false."/> -->
             </div>
             <div class="form-group row">
-                <label for="newStatementPosition" class="col-3 col-form-label">The above statement is </label>
+                <label for="newStatementPosition" class="col-sm-3 col-form-label">The above statement is </label>
               <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
                 <label button class="btn btn-light">
                   <input type="radio" id="newStatementPositionTrue" value="1" name="newStatementPosition">True
@@ -170,26 +170,26 @@
               </div>
             </div>
             <div class="form-group row">
-              <label for="newStatementStakeValue" class="col-3 col-form-label"">First Stake: </label>
-              <div class="col-2">
+              <label for="newStatementStakeValue" class="col-sm-3 col-form-label"">First Stake: </label>
+              <div class="col-sm-3">
                 <input class="form-control text-center" type="number" id="newStatementStakeValue" placeholder="0.750 ether" step="0.000001"/>
               </div>
             </div>
             <div class="form-group row">
-              <label for="newStatementStakingPeriod" class="col-3 col-form-label">Staking period (days): </label>
-              <div class="col-2">
+              <label for="newStatementStakingPeriod" class="col-sm-3 col-form-label">Staking period (days): </label>
+              <div class="col-sm-2">
                 <input class="form-control text-center" type="number" id="newStatementStakingPeriod" placeholder="7 days"/>
               </div>
             </div>
             <div class="form-group row">
-              <label for="newStatementSource" class="col-3 col-form-label"">Statement source: </label> 
-              <div class="col-4">
+              <label for="newStatementSource" class="col-sm-3 col-form-label"">Statement source: </label> 
+              <div class="col-sm-4">
                 <input class="form-control text-center" type="text" id="newStatementSource" placeholder="www.newyorktimes.com"/>
               </div>
             </div>
 
           </div>
-          <div class="col-md-12 text-center"> 
+          <div class="col-sm-12 text-center"> 
             <button type="submit" class="btn btn-primary float-right">Submit</button>
           </div>
         </form>
