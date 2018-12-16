@@ -1,9 +1,3 @@
-/*!
- * Start Bootstrap - Grayscale v5.0.2 (https://startbootstrap.com/template-overviews/grayscale)
- * Copyright 2013-2018 Start Bootstrap
- * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-grayscale/blob/master/LICENSE)
- */
-
 #mainNav {
   min-height: 56px;
   background-color: #fff;
@@ -85,7 +79,6 @@
     border-bottom: 0.25rem solid #64a19d;
   }
 }
-
 
 #secondaryNav {
   min-height: 56px;
@@ -194,14 +187,9 @@
 }
 
 .masthead h2 {
-  max-width: 40rem;
-  font-size: 2.5rem;
-  line-height: 2.5rem;
-  letter-spacing: 0.2rem;
+  max-width: 20rem;
+  font-size: 1rem;
 }
-
-
-
 
 @media (min-width: 768px) {
   .masthead h1 {
@@ -226,58 +214,109 @@
   }
 }
 
-.stake-head {
+.stakes-head {
   position: relative;
   width: 100%;
   height: 10rem;
   min-height: 10rem;
   padding: 15rem 0;
   color:white;
-  /*background: -webkit-gradient(linear, left top, left bottom, from(rgba(22, 22, 22, 0.1)), color-stop(75%, rgba(22, 22, 22, 0.5)), to(#161616)), url("../img/bg-masthead.jpg");*/
-  background: linear-gradient(to bottom, rgba(22, 22, 22, 0.1) 0%, rgba(22, 22, 22, 0.5) 75%, #161616 100%), url("../img/demo-image-02.jpg");
+  background: -webkit-gradient(linear, left top, left bottom, from(rgba(22, 22, 22, 0.1)), color-stop(75%, rgba(22, 22, 22, 0.5)), to(#161616)), url("../img/bg-masthead.jpg");
+  background: linear-gradient(to bottom, rgba(22, 22, 22, 0.1) 0%, rgba(22, 22, 22, 0.5) 75%, #161616 100%), url("../img/mountain-mist.jpg");
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: scroll;
   background-size: cover;
 }
 
-.stake-head h1 {
+.stakes-head h1 {
   font-family: 'Varela Round';
-  font-size: 5rem;
-  line-height: 5rem;
-  letter-spacing: 0.6rem;
+  font-size: 2.5rem;
+  letter-spacing: 0.8rem;
+  background: -webkit-linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));
+  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
 }
 
-.eth-staked {
-
+.stakes-head h2 {
+  font-size: 2rem;
+  background: -webkit-linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));
+  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
 }
 
-.eth-staked h2 {
-  max-width: 40rem;
-  font-size: 3rem;
-  letter-spacing: 0.2rem;
+.stakes-head h3 {
+  font-size: 1rem;
 }
 
-.eth-staked h3 {
-  max-width: 40rem;
-  font-size: 1.5rem;
-  letter-spacing: 0.2rem;
-}
-
-.eth-staked h2, h3 {
+.stakes-head h2, h3 {
   display: inline;
-  padding-top: 2rem;
-  line-height: 8rem;
+}
+
+
+@media (min-width: 768px) {
+  .stakes-head h1 {
+    font-size: 4rem;
+    line-height: 4rem;
+  }
+
+  .stakes-head h2 {
+    /*padding:10rem;*/
+    max-width: 40rem;
+    font-size: 2.5rem;
+    line-height: 5rem;
+    letter-spacing: 0.2rem;
+    color: white;
+  }
+
+  .stakes-head h3 {
+    max-width: 40rem;
+    font-size: 1.5rem;
+    letter-spacing: 0.2rem;
+  }
+  .stakes-head h2, h3 {
+    display: inline;
+  } 
+}
+
+.stake-table {
 
 }
 
+.stake-table-eth {
+  display: inline;
+  color:#64a19d;
+}
+
+.stake-table-eth h3 {
+  font-size: 1rem;
+}
+
+.stake-table-eth h4 {
+  font-size: 0.67rem;
+} 
+
+@media(min-width: 768px) {
+  .stake-table-eth h3 {
+    font-size: 3.5rem;
+  }
+
+  .stake-table-eth h4 {
+    font-size: 1rem;
+  }
+}
+
+.stake-table-statement {
+  font-size:1rem;
+
+}
 
 .btn {
   -webkit-box-shadow: 0 0.1875rem 0.1875rem 0 rgba(0, 0, 0, 0.1) !important;
   box-shadow: 0 0.1875rem 0.1875rem 0 rgba(0, 0, 0, 0.1) !important;
   padding: 1.25rem 2rem;
   font-family: 'Varela Round';
-  font-size: 90%;
+  font-size: 80%;
   text-transform: uppercase;
   letter-spacing: .15rem;
   border: 0;
@@ -307,36 +346,70 @@
   padding: 5px 50px;
 }
 
-.btn-truefalse {
-  -webkit-box-shadow: 0 0.1875rem 0.1875rem 0 rgba(0, 0, 0, 0.1) !important;
-  box-shadow: 0 0.1875rem 0.1875rem 0 rgba(0, 0, 0, 0.1) !important;
-  padding: 1.25rem 2rem;
+.info-section {
+  padding-top: 10rem;
+  background: -webkit-gradient(linear, left top, left bottom, from(#161616), color-stop(75%, rgba(22, 22, 22, 0.9)), to(rgba(22, 22, 22, 0.8)));
+  background: linear-gradient(to bottom, #161616 0%, rgba(22, 22, 22, 0.9) 75%, rgba(22, 22, 22, 0.8) 100%);
+}
+
+.info-section p {
+  margin-bottom: 5rem;
+}
+
+.info-section h3 {
   font-family: 'Varela Round';
+  font-size: 4rem;
+  line-height: 4rem;
+  background: -webkit-linear-gradient(rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.5));
+  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+}
+
+.info-section h4 {
+  font-family: 'Varela Round';
+  max-width: 20rem;
+  font-size: 1.5rem;
+
+}
+
+.info-section h3, h4 {
+  width: 50%;
+  height: 60px;
+  margin: 0;
+  padding: 0;
+  display: inline;
+
+}
+
+.stakes-section {
+  padding: 5rem 0;
+}
+
+.stakes-section .featured-text {
+  padding: 2rem;
+}
+
+@media (min-width: 992px) {
+  .stakes-section .featured-text {
+    padding: 0 0 0 2rem;
+    border-left: 0.5rem solid #64a19d;
+  }
+}
+
+.stakes-section .project-text {
+  padding: 3rem;
   font-size: 90%;
-  text-transform: uppercase;
-  letter-spacing: .15rem;
-  border: 5;
 }
 
-.card-btn {
-  font-family: 'Varela Round';
-  font-size: 100%;
-  text-transform: uppercase;
-  border: 0;
-  background-color: #64a19d;
-}
-
-.card-btn:hover {
-  background-color: #4f837f;
-}
-
-.card-btn:focus {
-  background-color: #4f837f;
-  color: white;
-}
-
-.card-btn:active {
-  background-color: #467370 !important;
+@media (min-width: 992px) {
+  .stakes-section .project-text {
+    padding: 5rem;
+  }
+  .stakes-section .project-text hr {
+    border-color: #64a19d;
+    border-width: .25rem;
+    width: 30%;
+  }
 }
 
 .about-page-header {
@@ -357,86 +430,6 @@
 
 .about-page h4 {
   margin-left: 10rem 0;
-}
-
-
-.about-section {
-  padding-top: 4rem;
-  background: -webkit-gradient(linear, left top, left bottom, from(#161616), color-stop(75%, rgba(22, 22, 22, 0.9)), to(rgba(22, 22, 22, 0.8)));
-  background: linear-gradient(to bottom, #161616 0%, rgba(22, 22, 22, 0.9) 75%, rgba(22, 22, 22, 0.8) 100%);
-}
-
-.about-section p {
-  margin-bottom: 3rem;
-}
-
-.about-section h3 {
-  font-family: 'Varela Round';
-  font-size: 4rem;
-  line-height: 2.5rem;
-  background: -webkit-linear-gradient(rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.5));
-  -webkit-text-fill-color: transparent;
-  -webkit-background-clip: text;
-}
-
-.about-section h4 {
-  font-family: 'Varela Round';
-  max-width: 20rem;
-  font-size: 1.5rem;
-
-}
-
-.about-section h3, h4 {
-  width: 50%;
-  height: 60px;
-  margin: 0;
-  padding: 0;
-  display: inline;
-
-}
-
-
-.stakes-section {
-  padding: 0rem 0;
-}
-
-.stakes-section .live-stakes {
-  padding: 4rem;
-}
-
-.stakes-section .past-stakes {
-  padding: 8rem;
-}
-
-.stakes-section .featured-text {
-  padding: 2rem;
-}
-
-@media (min-width: 992px) {
-  .stakes-section .featured-text {
-    padding: 0 0 0 2rem;
-    border-left: 0.5rem solid #64a19d;
-  }
-}
-
-.stakes-section .stake-text {
-  padding: 3rem;
-  font-size: 90%;
-}
-
-@media (min-width: 992px) {
-  .stakes-section .stake-text {
-    padding: 5rem;
-  }
-  .stakes-section .stake-text hr {
-    border-color: #64a19d;
-    border-width: .25rem;
-    width: 30%;
-  }
-}
-
-.new-statement {
-  padding: 4rem;
 }
 
 .signup-section {
@@ -505,6 +498,15 @@
   color: #fff;
 }
 
+.blockchain-loader {
+  height: 100%;
+  width: 100%;
+  line-height: 300px;
+  text-align: center;
+  display: inline-block
+
+}
+
 body {
   font-family: 'Nunito';
   letter-spacing: 0.0625em;
@@ -531,16 +533,22 @@ a:focus, a:hover {
   color: #64a19d !important;
 }
 
-.blockchain-loader {
-  height: 100%;
-  width: 100%;
-  line-height: 300px;
-  text-align: center;
-  display: inline-block
-
+/*SVG ICON SYSTEM*/
+.icon {
+    display: inline-flex;
+    align-self: center;
 }
 
+.icon svg, .icon img {
+    height: 1em;
+    width: 1em;
+    fill: currentColor;
+}
 
+.icon.baseline svg, .icon img {
+    top: .125em;
+    position: relative;
+}
 
 footer {
   padding: 5rem 0;

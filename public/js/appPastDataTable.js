@@ -132,7 +132,10 @@ App = {
 				var timeRemainingFormatted = App.secondsToDhm(timeRemainingSeconds);
 
 				var cardHtml = App.collapsingCardHTMLformatPastData(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted);
-				var ethStakedHtml = `<p class="display-4 text-center">${ethStaked}</p>`
+				var ethStakedHtml = `<div class="container" class="stake-table-eth text-center">
+										<h3>${ethStaked}</h3> 
+										<h4>ETH</h4>
+									</div>`
 
 				pastStatementsData.push([ethStakedHtml, cardHtml]);
 			}
@@ -147,8 +150,8 @@ App = {
 		$('#pastStatementTable').DataTable( {
 	        data: pastStatementsData,
 	        columns: [
-	            { title: "Sort by Value" },
-	            { title: "Sort by Recency"} //TODO: Need to change html in collapsingCardHTMLformat() to data-order by recency
+	            { title: "Value" },
+	            { title: "Recency"} //TODO: Need to change html in collapsingCardHTMLformat() to data-order by recency
 	        ],
 	        "order": [[ 0, "desc" ]]
 	    });

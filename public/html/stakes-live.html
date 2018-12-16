@@ -18,10 +18,13 @@
 
     <!-- Data Table CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
-
+    <link rel="stylesheet" href="../vendor/datatables/datatables-bootstrap4-1.10.19.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/rowreorder/1.2.4/css/rowReorder.bootstrap4.min.css">
+    
     <!-- Custom Grayscale -->
-    <link href="../css/custom-grayscale.css" rel="stylesheet">
+    <link href="../css/custom-truth-staking.css" rel="stylesheet">
+
   </head>
 
   <body class="bg-light">
@@ -55,21 +58,19 @@
     </nav>
 
     <!-- Header -->
-    <header class="stake-head">
+    <header class="stakes-head">
       <div class="container d-flex h-100 align-items-center">
         <div class="mx-auto text-center">
-          <h1 class="display-1 mx-auto">Live Stakes</h1>
+          <h1 class="mx-auto my-0 text-uppercase">Live Stakes</h1>
         </div>
       </div>
       <div class="container">
         <div class="mx-auto text-center">
-          <div class="my-5">
-            <div class="eth-staked">
-              <h2 class="display-4" id="liveEthStaked"></h2>
-              <h3>eth staked on</h3>
-              <h2 class="display-4" id="liveNumStatements"></h2>
-              <h3>claims</h3>
-            </div>
+          <div class="my-5 pt-3">
+            <h2 class="display-4" id="liveEthStaked"></h2>
+            <h3 class="text-white-50">eth staked on</h3>
+            <h2 class="display-4" id="liveNumStatements"></h2>
+            <h3 class="text-white-50">claims</h3>
           </div>
         </div>
       </div>
@@ -87,99 +88,100 @@
       <section id="live-stakes" class="bg-light py-5">
         <div class="container">
           <!-- Live Stakes -->  
-          <div id="liveStatementsAccordionTable">
-            <table id="liveStatementTable" class="" width="100%"></table>
+          <div id="liveStatementsAccordionTable" >
+            <table id="liveStatementTable" class="display" style="width:100%"></table>
           </div>
-        </div>
-      </section>
-
-      <!-- New Statement Section -->
-      <section id="new-claim" class="signup-section text-white">
-        <div class="container">
-          <h2 class="text-center display-4">Submit New Claim</h2>
-          <p class="text-center">earn double the reward for submitting a new claim</p>
-          <br/>
-          <form onSubmit="App.makeNewStatement(newStatementString, newStatementPosition, newStatementStakingPeriod, newStatementSource, newStatementStakeValue); return false;">
-            <div class="text-right">
-              <div class="form-group row">
-                <label for="newStatementString" class="col-3 col-form-label">Paste new statement: </label>
-                <textarea class="form-control col-9" id="newStatementString" rows="2"></textarea>
-                <!-- <input type="text" class="form-control" id="newStatementString" placeholder="This sentence is false."/> -->
-              </div>
-              <div class="form-group row">
-                  <label for="newStatementPosition" class="col-3 col-form-label">The above statement is </label>
-                <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
-                  <label button class="btn btn-light">
-                    <input type="radio" id="newStatementPositionTrue" value="1" name="newStatementPosition">True
-                  </label>
-                  <label button class="btn btn-light">
-                    <input type="radio" id="newStatementPositionFalse" value="0" name="newStatementPosition">False
-                  </label>
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="newStatementStakeValue" class="col-3 col-form-label"">First Stake: </label>
-                <div class="col-2">
-                  <input class="form-control text-center" type="number" id="newStatementStakeValue" placeholder="0.750 ether" step="0.000001"/>
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="newStatementStakingPeriod" class="col-3 col-form-label">Staking period (days): </label>
-                <div class="col-2">
-                  <input class="form-control text-center" type="number" id="newStatementStakingPeriod" placeholder="7 days"/>
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="newStatementSource" class="col-3 col-form-label"">Statement source: </label> 
-                <div class="col-4">
-                  <input class="form-control text-center" type="text" id="newStatementSource" placeholder="www.newyorktimes.com"/>
-                </div>
-              </div>
-
-            </div>
-            <div class="col-md-12 text-center"> 
-              <button type="submit" class="btn btn-primary float-right">Submit</button>
-            </div>
-          </form>
-        </div>
-      </section>
-
-       <!-- Contact Section -->
-      <section class="contact-section bg-black">
-        <div class="container">
-
-          <div class="row">
-
-            <div class="col-md-4 offset-md-2 mb-3 mb-md-0">
-              <div class="card py-4 h-100">
-                <div class="card-body text-center">
-                  <i class="fas fa-file-contract text-primary mb-2"></i>
-                  <h4 class="text-uppercase m-0">Smart Contract</h4>
-                  <hr class="my-4">
-                  <div class="small text-black-50"><a href="https://ropsten.etherscan.io/address/0x6331d0f1b7bffe248c6a57c4de848295a5831849" target="_blank">lives here</a></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-4 mb-3 mb-md-0">
-              <div class="card py-4 h-100">
-                <div class="card-body text-center">
-                  <i class="fas fa-envelope text-primary mb-2"></i>
-                  <h4 class="text-uppercase m-0">Email</h4>
-                  <hr class="my-4">
-                  <div class="small text-black-50">
-                    <address><a href="mailto:kris@truthstaking.com">kris@truthstaking.com</a></address>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-     
-          </div>
-
         </div>
       </section>
     </div>
+
+
+    <!-- New Statement Section -->
+    <section id="new-claim" class="signup-section text-white">
+      <div class="container">
+        <h2 class="text-center display-4">Submit New Claim</h2>
+        <p class="text-center">earn double the reward for submitting a new claim</p>
+        <br/>
+        <form onSubmit="App.makeNewStatement(newStatementString, newStatementPosition, newStatementStakingPeriod, newStatementSource, newStatementStakeValue); return false;">
+          <div class="text-right">
+            <div class="form-group row">
+              <label for="newStatementString" class="col-sm-3 col-form-label">Paste new statement: </label>
+              <textarea class="form-control col-sm-9" id="newStatementString" rows="2"></textarea>
+              <!-- <input type="text" class="form-control" id="newStatementString" placeholder="This sentence is false."/> -->
+            </div>
+            <div class="form-group row">
+                <label for="newStatementPosition" class="col-sm-3 col-form-label">The above statement is </label>
+              <div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="Center Align">
+                <label button class="btn btn-light">
+                  <input type="radio" id="newStatementPositionTrue" value="1" name="newStatementPosition">True
+                </label>
+                <label button class="btn btn-light">
+                  <input type="radio" id="newStatementPositionFalse" value="0" name="newStatementPosition">False
+                </label>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="newStatementStakeValue" class="col-sm-3 col-form-label"">First Stake: </label>
+              <div class="col-sm-3">
+                <input class="form-control text-center" type="number" id="newStatementStakeValue" placeholder="0.750 ether" step="0.000001"/>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="newStatementStakingPeriod" class="col-sm-3 col-form-label">Staking period (days): </label>
+              <div class="col-sm-2">
+                <input class="form-control text-center" type="number" id="newStatementStakingPeriod" placeholder="7 days"/>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="newStatementSource" class="col-sm-3 col-form-label"">Statement source: </label> 
+              <div class="col-sm-4">
+                <input class="form-control text-center" type="text" id="newStatementSource" placeholder="www.newyorktimes.com"/>
+              </div>
+            </div>
+
+          </div>
+          <div class="col-sm-12 text-center"> 
+            <button type="submit" class="btn btn-primary float-right">Submit</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+     <!-- Contact Section -->
+    <section class="contact-section bg-black">
+      <div class="container">
+
+        <div class="row">
+
+          <div class="col-md-4 offset-md-2 mb-3 mb-md-0">
+            <div class="card py-4 h-100">
+              <div class="card-body text-center">
+                <i class="fas fa-file-contract text-primary mb-2"></i>
+                <h4 class="text-uppercase m-0">Smart Contract</h4>
+                <hr class="my-4">
+                <div class="small text-black-50"><a href="https://ropsten.etherscan.io/address/0x6331d0f1b7bffe248c6a57c4de848295a5831849" target="_blank">lives here</a></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-3 mb-md-0">
+            <div class="card py-4 h-100">
+              <div class="card-body text-center">
+                <i class="fas fa-envelope text-primary mb-2"></i>
+                <h4 class="text-uppercase m-0">Email</h4>
+                <hr class="my-4">
+                <div class="small text-black-50">
+                  <address><a href="mailto:kris@truthstaking.com">kris@truthstaking.com</a></address>
+                </div>
+              </div>
+            </div>
+          </div>
+
+   
+        </div>
+
+      </div>
+    </section>
 
     <!-- Footer -->
     <footer class="bg-black small text-center text-white-50">
@@ -199,6 +201,9 @@
     <!-- Data Table -->
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js""></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.2/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.2/js/responsive.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/rowreorder/1.2.4/js/dataTables.rowReorder.min.js"></script>
 
     <!-- Plugin JavaScript -->
     <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>

@@ -135,7 +135,10 @@ App = {
 				var timeRemainingFormatted = App.secondsToDhm(timeRemainingSeconds);
 
 				var cardHtml = App.collapsingCardHTMLformatLiveData(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted);
-				var ethStakedHtml = `<p class="display-4 text-center">${ethStaked}</p>`
+				var ethStakedHtml = `<div class="container" class="stake-table-eth text-center">
+										<h3>${ethStaked}</h3> 
+										<h4>ETH</h4>
+									</div>`
 
 				liveStatementsData.push([ethStakedHtml, cardHtml]);
 			}
@@ -150,10 +153,11 @@ App = {
 		$('#liveStatementTable').DataTable( {
 	        data: liveStatementsData,
 	        columns: [
-	            { title: "Sort by Value" },
-	            { title: "Sort by Recency"} //TODO: Need to change html in collapsingCardHTMLformat() to data-order by recency
+	            { title: "Value" },
+	            { title: "Recency"} //TODO: Need to change html in collapsingCardHTMLformat() to data-order by recency
 	        ],
-	        "order": [[ 0, "desc" ]]
+	        "order": [[ 0, "desc" ]],
+	        responsive: true
 	    });
 
 	    $("#loader").hide();
@@ -168,7 +172,7 @@ App = {
 			                
 			                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
 			                    <button class="btn-default border-0 bg-light">
-			                      	<p class="font-weight-light lead">${statementText}</p>
+			                      	<p class="stake-table-statement font-weight-light lead">${statementText}</p>
 			                    </button>
 			                </div>
 

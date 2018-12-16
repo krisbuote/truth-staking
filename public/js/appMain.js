@@ -254,7 +254,7 @@ App = {
 													    	<input type="radio" class="text-center" id="falseButton${statementID}" value="0" name="stakePosition${statementID}">False
 													    </label>
 													</div>
-												</div>
+												</div> 
 											</div>
 										</div>
 									
