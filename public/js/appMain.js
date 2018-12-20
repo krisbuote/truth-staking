@@ -317,8 +317,8 @@ App = {
 		                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
 		                    <button class="btn-default border-0 bg-light">
 		                    	<abbr class="text-center lead text-primary">${ethStaked} eth</abbr>
-		                      	<p class="font-weight-light">${statementText}</p>
-		                      	<p class="font-weight-light">Verdict: ${verdict}</p>
+			                    <p class="stake-table-statement font-weight-light lead">${statementText}</p>
+			                    <p class="">Verdict: <b>${verdict}</b></p>
 		                    </button>
 		                </div>
 
