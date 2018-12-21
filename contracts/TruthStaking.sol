@@ -239,7 +239,10 @@ contract TruthStaking {
 
 		// If it is near the end of the stake and someone stakes a large amount, time is added.
 		// uint pctTimeRemaining = 100 * (s.stakeEndTime.sub(now)) / (s.stakeDuration);
-		uint pctTimeRemaining = 100.mul(s.stakeEndTime.sub(now)).div(s.stakeDuration)
+		uint oneHundred = 100;
+		uint ten = 10;
+		uint test = oneHundred.mul(ten);
+		uint pctTimeRemaining = 100.mul(s.stakeEndTime.sub(now)).div(s.stakeDuration);
 
 		if (pctTimeRemaining <= pctTimeRemainingThreshold) {
 
