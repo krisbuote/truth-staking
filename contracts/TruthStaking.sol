@@ -1,12 +1,99 @@
-// Author: Kristopher Buote
-// This contract enables people to stake Ether on a statment being true or false. 
-// Winnings are distributed automatically as determined by majority stake at the end of staking round.
-// ***** WORK IN PROGRESS *****
+pragma solidity ^0.4.24;
 
-pragma solidity ^0.4.2;
+/**
+ * @title SafeMath
+ * @dev Math operations with safety checks that revert on error
+ */
+library SafeMath {
 
-import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
-import 'openzeppelin-solidity/contracts/math/Math.sol';
+  /**
+  * @dev Multiplies two numbers, reverts on overflow.
+  */
+  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+    // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
+    // benefit is lost if 'b' is also tested.
+    // See: https://github.com/OpenZeppelin/openzeppelin-solidity/pull/522
+    if (a == 0) {
+      return 0;
+    }
+
+    uint256 c = a * b;
+    require(c / a == b);
+
+    return c;
+  }
+
+  /**
+  * @dev Integer division of two numbers truncating the quotient, reverts on division by zero.
+  */
+  function div(uint256 a, uint256 b) internal pure returns (uint256) {
+    require(b > 0); // Solidity only automatically asserts when dividing by 0
+    uint256 c = a / b;
+    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+
+    return c;
+  }
+
+  /**
+  * @dev Subtracts two numbers, reverts on overflow (i.e. if subtrahend is greater than minuend).
+  */
+  function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+    require(b <= a);
+    uint256 c = a - b;
+
+    return c;
+  }
+
+  /**
+  * @dev Adds two numbers, reverts on overflow.
+  */
+  function add(uint256 a, uint256 b) internal pure returns (uint256) {
+    uint256 c = a + b;
+    require(c >= a);
+
+    return c;
+  }
+
+  /**
+  * @dev Divides two numbers and returns the remainder (unsigned integer modulo),
+  * reverts when dividing by zero.
+  */
+  function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+    require(b != 0);
+    return a % b;
+  }
+}
+
+
+/**
+ * @title Math
+ * @dev Assorted math operations
+ */
+library Math {
+    /**
+    * @dev Returns the largest of two numbers.
+    */
+    function max(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a >= b ? a : b;
+    }
+
+    /**
+    * @dev Returns the smallest of two numbers.
+    */
+    function min(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a < b ? a : b;
+    }
+
+    /**
+    * @dev Calculates the average of two numbers. Since these are integers,
+    * averages of an even and odd number cannot be represented, and will be
+    * rounded down.
+    */
+    function average(uint256 a, uint256 b) internal pure returns (uint256) {
+        // (a + b) / 2 can overflow, so we distribute
+        return (a / 2) + (b / 2) + ((a % 2 + b % 2) / 2);
+    }
+}
 
 contract TruthStaking {
 
@@ -122,7 +209,7 @@ contract TruthStaking {
 		require(_position == 0 || _position == 1, "Invalid position to stake on."); 
 		require(_stakeDuration > 60, "Stake duration must be at least 60 seconds.");
 
-		uint stakeEndTime = now + _stakeDuration;
+		uint stakeEndTime = now.add(_stakeDuration);
 
 		statementID = absNumStatements++; //sets statementID and THEN increases absNumStatements by 1
 		statements[statementID] = Statement(statementID, _statement, _stakeDuration, now, stakeEndTime, msg.sender, 0, 0, false, _source, 3);
@@ -151,17 +238,20 @@ contract TruthStaking {
 		s.stakes[s.numStakes++] = Stake({addr:msg.sender, amount:msg.value, position:_position});
 
 		// If it is near the end of the stake and someone stakes a large amount, time is added.
-		uint pctTimeRemaining = 100 * (s.stakeEndTime - now) / (s.stakeDuration);
+		// uint pctTimeRemaining = 100 * (s.stakeEndTime.sub(now)) / (s.stakeDuration);
+		uint pctTimeRemaining = 100.mul(s.stakeEndTime.sub(now)).div(s.stakeDuration)
 
 		if (pctTimeRemaining <= pctTimeRemainingThreshold) {
 
 		    assert(s.ethStaked > 0);
-		    uint percentOfCurrentPot = 100 * msg.value / s.ethStaked;
+		    // uint percentOfCurrentPot = 100 * msg.value / s.ethStaked;
+		    uint percentOfCurrentPot = div(mul(100, msg.value), s.ethStaked);
 		    
 		    if (percentOfCurrentPot > minPotPctThreshold) {
 		        
     			// extraTime = stakeDuration * size of stake * time added per stake size ratio. More generally, extraTime = time * x * slope
-    			uint extraTimeRaw = s.stakeDuration * (percentOfCurrentPot - minPotPctThreshold) * (maxTimeAddPct - minTimeAddPct) / (maxPotPctThreshold - minPotPctThreshold) / 100;
+    			// uint extraTimeRaw = s.stakeDuration * (percentOfCurrentPot.sub(minPotPctThreshold)) * (maxTimeAddPct.sub(minTimeAddPct)) / (maxPotPctThreshold.sub(minPotPctThreshold)) / 100;
+    			uint extraTimeRaw = s.stakeDuration * (percentOfCurrentPot.sub(minPotPctThreshold)) * (maxTimeAddPct.sub(minTimeAddPct)) / (maxPotPctThreshold.sub(minPotPctThreshold)) / 100;
     
     			// Cap the amount of extra time added.
     			uint extraTime = Math.min(extraTimeRaw, s.stakeDuration * maxTimeAddPct / 100);
@@ -196,7 +286,7 @@ contract TruthStaking {
 			p.F += _amount;
 		}
 
-		emit CurrentPot(_statementID, p.T + p.F);
+		emit CurrentPot(_statementID, p.T.add(p.F));
 
 	}
 
@@ -254,7 +344,7 @@ contract TruthStaking {
 
 		// Platform Service Fee
 		uint fee = losingPot * serviceFeeTenThousandths / 10000;
-		uint potRemaining = losingPot - fee;
+		uint potRemaining = losingPot.sub(fee);
 
 		emit FeeCheck(fee);
 		emit PotsCheck(winningPot, potRemaining);
@@ -268,7 +358,7 @@ contract TruthStaking {
 		}
 
 		// Reward marketMaker two times
-		uint marketMakerReward = potRemaining * s.stakes[0].amount / (winningPot + potRemaining);
+		uint marketMakerReward = potRemaining * s.stakes[0].amount / (winningPot.add(potRemaining));
 		emit RewardCheck(marketMakerReward);
 
 		s.stakes[0].addr.transfer(marketMakerReward);
@@ -290,7 +380,7 @@ contract TruthStaking {
 				emit ProfitCheck(profit);
 
 				// Their reward is original stake + profit
-				reward = s.stakes[j].amount + profit;
+				reward = profit.add(s.stakes[j].amount);
 				emit RewardCheck(reward);
 
 				// Send the winner their reward
@@ -327,11 +417,15 @@ contract TruthStaking {
 	}
 
 	function removeBeneficiary(uint _index, address _beneficiaryAddress) public onlyOwner {
+		require(beneficiaryAddresses.length > 0, 'There are no beneficiaries to remove.');
 		require(_beneficiaryAddress == beneficiaryAddresses[_index], "The beneficiary address must match beneficiaryAddresses[index].");
+
 		beneficiaryShares[_beneficiaryAddress] = 0; // set beneficiary shares to 0
 		delete beneficiaryAddresses[_index]; // remove the beneficiary
 		beneficiaryAddresses[_index] = beneficiaryAddresses[beneficiaryAddresses.length - 1]; // replace the empty spot with most recently added
 		delete beneficiaryAddresses[beneficiaryAddresses.length - 1]; // delete the redundant copy
+
+
 
 	}
 

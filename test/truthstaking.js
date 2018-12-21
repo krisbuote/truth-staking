@@ -38,26 +38,49 @@ contract("TruthStaking", function(accounts) {
 		});
 	});
 
+
+	it("allows one beneficiary to be added and then deleted", function() {
+		return TruthStaking.deployed().then(function(instance) {
+			TruthStakingInstance = instance;
+			return TruthStakingInstance.addBeneficiary(wallet3, 175);
+		}).then(function(result) {
+			return TruthStakingInstance.beneficiaryAddresses(0); // check if added
+		}).then(function(result) {
+			console.log(result);
+		return TruthStakingInstance.beneficiaryShares(result);
+		}).then(function(result) {
+			console.log(result);
+			return TruthStakingInstance.removeBeneficiary(0, wallet3);
+		}).then(function(result) {
+			return TruthStakingInstance.beneficiaryAddresses(0); // check if deleted 
+		}).then(function(result) {
+			console.log(result);
+			return TruthStakingInstance.beneficiaryShares(result);
+		}).then(function(result) {
+			console.log(result);
+		});
+	});
+
 	it("allows beneficiaries to be added", function() {
 		return TruthStaking.deployed().then(function(instance) {
 			TruthStakingInstance = instance;
-			return TruthStakingInstance.setBeneficiaryShareTenThousandths(wallet8, 25);
+			return TruthStakingInstance.addBeneficiary(wallet8, 25);
 		}).then(function(result) {
-			return TruthStakingInstance.setBeneficiaryShareTenThousandths(wallet9, 33);
+			return TruthStakingInstance.addBeneficiary(wallet9, 33);
 		}).then(function(result){
-			return TruthStakingInstance.setBeneficiaryShareTenThousandths(wallet1, 33);
+			return TruthStakingInstance.addBeneficiary(wallet1, 34);
 		}).then(function(result){
-			return TruthStakingInstance.setBeneficiaryShareTenThousandths(wallet2, 33);
+			return TruthStakingInstance.addBeneficiary(wallet2, 35);
 		}).then(function(result){
-			return TruthStakingInstance.setBeneficiaryShareTenThousandths(wallet3, 33);
+			return TruthStakingInstance.addBeneficiary(wallet3, 36);
 		}).then(function(result){
-			return TruthStakingInstance.setBeneficiaryShareTenThousandths(wallet4, 33);
+			return TruthStakingInstance.addBeneficiary(wallet4, 37);
 		}).then(function(result){
-			return TruthStakingInstance.setBeneficiaryShareTenThousandths(wallet5, 33);
+			return TruthStakingInstance.addBeneficiary(wallet5, 38);
 		}).then(function(result){
-			return TruthStakingInstance.setBeneficiaryShareTenThousandths(wallet6, 33);
+			return TruthStakingInstance.addBeneficiary(wallet6, 39);
 		}).then(function(result){
-			return TruthStakingInstance.setBeneficiaryShareTenThousandths(wallet7, 33);
+			return TruthStakingInstance.addBeneficiary(wallet7, 40);
 		}).then(function(result){
 			
 			
@@ -67,7 +90,7 @@ contract("TruthStaking", function(accounts) {
 	it("allows beneficiary address/shares to be read", function() {
 		return TruthStaking.deployed().then(function(instance) {
 			TruthStakingInstance = instance;
-			return TruthStakingInstance.beneficiaryAddresses(0);
+			return TruthStakingInstance.beneficiaryAddresses(1);
 		}).then(function(result) {
 			console.log(result);
 			return TruthStakingInstance.beneficiaryShares(result);
@@ -79,9 +102,9 @@ contract("TruthStaking", function(accounts) {
 	it("removes beneficiary", function() {
 		return TruthStaking.deployed().then(function(instance) {
 			TruthStakingInstance = instance;
-			return TruthStakingInstance.removeBeneficiary(0, wallet8);
+			return TruthStakingInstance.removeBeneficiary(1, wallet8);
 		}).then(function(result) {
-			return TruthStakingInstance.beneficiaryAddresses(0); // check if replaced 
+			return TruthStakingInstance.beneficiaryAddresses(1); // check if replaced 
 		}).then(function(result) {
 			console.log(result);
 			return TruthStakingInstance.beneficiaryShares(result);
@@ -113,7 +136,7 @@ contract("TruthStaking", function(accounts) {
 
 	});
 
-	makeNstatments(10);
+	makeNstatments(1);
 
 
 	it('allows statements() call', function() {
@@ -136,7 +159,7 @@ contract("TruthStaking", function(accounts) {
 		});
 	});
 
-	makeNstakes(10, 0, 0);
+	makeNstakes(1, 0, 0);
 
 
 	it("allow endStake() on valid statementID", function() {
