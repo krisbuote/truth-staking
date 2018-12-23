@@ -129,15 +129,23 @@ contract("TruthStaking", function(accounts) {
 	it('allows new statement creation', function() {
 		return TruthStaking.deployed().then(function(instance) {
 			TruthStakingInstance = instance;
-			return TruthStakingInstance.newStatement("New Statement of typical lorem ipsum lenght alchemical stuff inserted in the psyche and found to destroy donald Trump through individuation.New Statement of typical lorem ipsum lenght alchemical stuff inserted in the psyche and found to destroy donald Trump through individuation.", 1, 36000, " source: www.newyourktimes.com/stuff/here ", {from:wallet1, value:10**18});
+			return TruthStakingInstance.newStatement("New Statement of typical lorem ipsum lenght alchemical stuff inserted in the psyche and found to destroy donald Trump through individuation.New Statement of typical lorem ipsum lenght alchemical stuff inserted in the psyche and found to destroy donald Trump through individuation.", 1, 61, " source: www.newyourktimes.com/stuff/here ", {from:wallet5, value:10**18});
 			}).then(function(result) {
 			assert.equal(result.logs.length, 3, "correct number of events triggered");
 		});
 
 	});
 
-	makeNstatments(5);
+	it("allows stake on statement(0)", function() {
+		return TruthStaking.deployed().then(function(instance) {
+			TruthStakingInstance = instance;
+			return TruthStakingInstance.stake(0, 1, {from:wallet5, value:10**9});
+			}).then(function(result) {
+		});
+	});
 
+
+	makeNstakes(50, 0, 0);	// stake 100 times on first statement
 
 	it('allows statements() call', function() {
 		return TruthStaking.deployed().then(function(instance) {
@@ -148,28 +156,6 @@ contract("TruthStaking", function(accounts) {
 
 	});
 
-
-
-
-	it("allows stake on statement(0)", function() {
-		return TruthStaking.deployed().then(function(instance) {
-			TruthStakingInstance = instance;
-			return TruthStakingInstance.stake(0, 0, {from:wallet1, value:10**9});
-			}).then(function(result) {
-		});
-	});
-
-	makeNstakes(100, 0, 0);
-
-
-	it("allow endStake() on valid statementID", function() {
-		return TruthStaking.deployed().then(function(instance) {
-			TruthStakingInstance = instance;
-			return TruthStakingInstance.endStake(0);
-		}).then(function(result) {
-			// console.log(result);
-		});
-	});
 
 	// TEST ADD TIME FUNCTION
 
@@ -194,8 +180,16 @@ contract("TruthStaking", function(accounts) {
 	});
 
 
+	it("allow endStake() on valid statementID for ended stake", function() {
+		return TruthStaking.deployed().then(function(instance) {
+			TruthStakingInstance = instance;
+			return TruthStakingInstance.endStake(0);
+		}).then(function(result) {
+			// console.log(result);
+		});
+	});
 
-
+	makeNstatements(5);
 
 	it("allows self_destruct()", function() {
 		return TruthStaking.deployed().then(function(instance) {
@@ -220,7 +214,7 @@ contract("TruthStaking", function(accounts) {
 
 	}
 
-	function makeNstatments(n) {
+	function makeNstatements(n) {
 		for (let i=0; i<n; i++) {
 			console.log("statementCreation call ", i);
 			makeNewStatement();
