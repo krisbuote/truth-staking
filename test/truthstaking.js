@@ -136,7 +136,7 @@ contract("TruthStaking", function(accounts) {
 
 	});
 
-	makeNstatments(1);
+	makeNstatments(5);
 
 
 	it('allows statements() call', function() {
@@ -159,7 +159,7 @@ contract("TruthStaking", function(accounts) {
 		});
 	});
 
-	makeNstakes(1, 0, 0);
+	makeNstakes(100, 0, 0);
 
 
 	it("allow endStake() on valid statementID", function() {
@@ -171,27 +171,27 @@ contract("TruthStaking", function(accounts) {
 		});
 	});
 
-	// // TEST ADD TIME FUNCTION
+	// TEST ADD TIME FUNCTION
 
 
-	// it('allows new statement with 61 seconds, prints stakeEndTime, waits, stakes large to add time', function() {
-	// 	return TruthStaking.deployed().then(function(instance) {
-	// 		TruthStakingInstance = instance;
-	// 		return TruthStakingInstance.newStatement("New Statement to test add time.", 1, 61, " source: www.love.com.com/me ", {from:wallet1, value:10**9});
-	// 		}).then(function(result) {
-	// 		assert.equal(result.logs.length, 3, "correct number of events triggered");
-	// 		return TruthStakingInstance.statements(1);
-	// 	}).then(function(result) {
-	// 		console.log("Statement end time original:", result);
-	// 		wait(50000); //wait 50 seconds
-	// 		return TruthStakingInstance.stake(1,1, {from:wallet6, value:10**9});
-	// 	}).then(function(result) {
-	// 		return TruthStakingInstance.statements(1);
-	// 	}).then(function(result){
-	// 		console.log("statement end time new:", result);
-	// 	});
+	it('allows new statement with 61 seconds, prints stakeEndTime, waits, stakes large to add time', function() {
+		return TruthStaking.deployed().then(function(instance) {
+			TruthStakingInstance = instance;
+			return TruthStakingInstance.newStatement("New Statement to test add time.", 1, 61, " source: www.love.com.com/me ", {from:wallet1, value:10**9});
+			}).then(function(result) {
+			assert.equal(result.logs.length, 3, "correct number of events triggered");
+			return TruthStakingInstance.statements(1);
+		}).then(function(result) {
+			console.log("Statement end time original:", result);
+			wait(50000); //wait 50 seconds
+			return TruthStakingInstance.stake(1,1, {from:wallet6, value:10**9});
+		}).then(function(result) {
+			return TruthStakingInstance.statements(1);
+		}).then(function(result){
+			console.log("statement end time new:", result);
+		});
 
-	// });
+	});
 
 
 

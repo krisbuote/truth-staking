@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/krisbuote/truth-staking-release.git"
+    "url": "git+https://github.com/krisbuote/truth-staking.git"
   },
   "keywords": [
     "truth",
@@ -22,7 +22,7 @@
   "author": "Kristopher Buote",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/krisbuote/truth-staking-release/issues"
+    "url": "https://github.com/krisbuote/truth-staking/issues"
   },
   "devDependencies": {
     "ethereumjs-tx": "^1.3.7",
