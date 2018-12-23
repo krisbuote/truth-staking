@@ -38,6 +38,29 @@ contract("TruthStaking", function(accounts) {
 		});
 	});
 
+	it('allows new statement creation', function() {
+		return TruthStaking.deployed().then(function(instance) {
+			TruthStakingInstance = instance;
+			return TruthStakingInstance.newStatement("New Statement of typical lorem ipsum lenght alchemical stuff inserted in the psyche and found to destroy donald Trump through individuation.New Statement of typical lorem ipsum lenght alchemical stuff inserted in the psyche and found to destroy donald Trump through individuation.", 1, 61, " source: www.newyourktimes.com/stuff/here ", {from:wallet5, value:0.5*(10**18)});
+			}).then(function(result) {
+			assert.equal(result.logs.length, 3, "correct number of events triggered");
+		});
+
+	});
+
+	it("allows stakes on statement(0). wallet 9 should receive 0.5*4 ether", function() {
+		return TruthStaking.deployed().then(function(instance) {
+			TruthStakingInstance = instance;
+			return TruthStakingInstance.stake(0, 1, {from:wallet6, value:0.5*(10**18)});
+			}).then(function(result) {
+			return TruthStakingInstance.stake(0, 1, {from:wallet7, value:0.5*(10**18)});
+			}).then(function(result) {
+			return TruthStakingInstance.stake(0, 1, {from:wallet8, value:0.5*(10**18)});
+			}).then(function(result) {
+			return TruthStakingInstance.stake(0, 0, {from:wallet9, value:5*(10**18)});
+		});
+	});
+
 
 	it("allows one beneficiary to be added and then deleted", function() {
 		return TruthStaking.deployed().then(function(instance) {
@@ -126,32 +149,16 @@ contract("TruthStaking", function(accounts) {
 		});
 	});
 
-	it('allows new statement creation', function() {
-		return TruthStaking.deployed().then(function(instance) {
-			TruthStakingInstance = instance;
-			return TruthStakingInstance.newStatement("New Statement of typical lorem ipsum lenght alchemical stuff inserted in the psyche and found to destroy donald Trump through individuation.New Statement of typical lorem ipsum lenght alchemical stuff inserted in the psyche and found to destroy donald Trump through individuation.", 1, 61, " source: www.newyourktimes.com/stuff/here ", {from:wallet5, value:10**18});
-			}).then(function(result) {
-			assert.equal(result.logs.length, 3, "correct number of events triggered");
-		});
-
-	});
-
-	it("allows stake on statement(0)", function() {
-		return TruthStaking.deployed().then(function(instance) {
-			TruthStakingInstance = instance;
-			return TruthStakingInstance.stake(0, 1, {from:wallet5, value:10**9});
-			}).then(function(result) {
-		});
-	});
 
 
-	makeNstakes(50, 0, 0);	// stake 100 times on first statement
+
 
 	it('allows statements() call', function() {
 		return TruthStaking.deployed().then(function(instance) {
 			TruthStakingInstance = instance;
 			return TruthStakingInstance.statements(0);
 			}).then(function(result) {
+			console.log(result);
 		});
 
 	});
@@ -183,6 +190,7 @@ contract("TruthStaking", function(accounts) {
 	it("allow endStake() on valid statementID for ended stake", function() {
 		return TruthStaking.deployed().then(function(instance) {
 			TruthStakingInstance = instance;
+			wait(20000);
 			return TruthStakingInstance.endStake(0);
 		}).then(function(result) {
 			// console.log(result);
@@ -190,6 +198,10 @@ contract("TruthStaking", function(accounts) {
 	});
 
 	makeNstatements(5);
+	makeNstakes(5, 3, 0);	// stake 100 times on first statement
+
+
+
 
 	it("allows self_destruct()", function() {
 		return TruthStaking.deployed().then(function(instance) {
