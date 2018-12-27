@@ -410,7 +410,7 @@ App = {
 	    var stakeValue = _stakeValue.value;
 
 	    if (!App.account) {
-	    	alert("Please sign into MetaMask and refresh the page.");
+	    	alert("Truth Staking uses MetaMask to secure your transactions. Please install MetaMask from https://metamask.io/ \n\nIf you have MetaMask installed, please sign in and refresh the page.");
 	    }
 
 	    else if (!stakePosition) {

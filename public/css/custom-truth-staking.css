@@ -359,6 +359,14 @@
   padding: 5px 50px;
 }
 
+.btn-link {
+  color: #64a19d;
+  -webkit-box-shadow: 0 0.1875rem 0.1875rem 0 rgba(0, 0, 0, 0) !important;
+  box-shadow: 0 0.1875rem 0.1875rem 0 rgba(0, 0, 0, 0) !important;
+  text-transform: none;
+  letter-spacing: 0rem;
+}
+
 .info-section {
   padding-top: 10rem;
   background: -webkit-gradient(linear, left top, left bottom, from(#161616), color-stop(75%, rgba(22, 22, 22, 0.9)), to(rgba(22, 22, 22, 0.8)));
@@ -426,6 +434,18 @@
 }
 
 .about-page-header {
+
+  position: relative;
+  width: 100%;
+  height: auto;
+  min-height: 0rem;
+  padding: 0rem 0;
+  margin-top: 112px;
+  margin-bottom: 56px;
+
+}
+
+.about-page-FAQ-header {
 
   position: relative;
   width: 100%;
