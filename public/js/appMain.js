@@ -7,6 +7,7 @@ App = {
 	contracts: {},
   	truthStakingContract: null,
   	allStatementsArray: [],
+  	priceUSD: null,
   	account: '0x0',
 
 	init: function() {
@@ -105,8 +106,13 @@ App = {
 
 
 	getStatementDataAndDisplayPopularStakes: function(_index, _numStatements, _contractInstance) {
-		// Queries blockchain for statement data
+		
+		// Get eth price in USD
+		$.get('https://api.coinmarketcap.com/v1/ticker/ethereum/', function(data, status) {
+			App.priceUSD = data[0].price_usd;
+		});
 
+		// Queries blockchain for statement data
 		_contractInstance.statements(_index, function(error, statement) {
 
 			if(!error){	
@@ -164,6 +170,9 @@ App = {
 		var popularLiveStakesCards = $("#popularLiveStakesCards");
 		popularLiveStakesCards.empty();
 
+
+
+		// get statement data
 		for (let s=0; s<numPopularStatementsDisplayed; s++) {
 			var idx = indicesOfMaxLiveEth[s];
 			var statement = popularStatementsLiveData[idx];
@@ -178,16 +187,9 @@ App = {
 			var ethStaked = (statement[7] / 10**18).toFixed(3);
 			var stakeEnded = statement[8];
 			var statementSource = statement[9];
-			var verdict = statement[10];
+			// var verdict = statement[10];
 
-	
-
-		    // var eth_USD = coinMarketCap_ETH[0].price_usd
-		    // console.log(eth_USD);
-
-			// https://api.coinmarketcap.com/v1/ticker/ethereum/
-
-
+			// Format time remaining
 			var timeRemainingSeconds = stakeEndTime - Math.floor(Date.now()/1000);
 			if (timeRemainingSeconds > 0) {
 				var timeRemainingFormatted = App.secondsToDhm(timeRemainingSeconds);
@@ -195,14 +197,23 @@ App = {
 			else {
 				var timeRemainingFormatted = "FINISHED"
 			}
+
+			// Value in USD
+			if (App.priceUSD == null) {
+				var valueUSD = '';
+			}
+			else {
+				var valueUSD = '($' + Math.round(App.priceUSD*ethStaked) + ')';
+			}
+
+			// Stake statistics: num stakes or average stake size
 			
 
-			var html = App.collapsingCardHTMLformatLiveData(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted);
+			var html = App.collapsingCardHTMLformatLiveData(statementID, statementText, ethStaked, valueUSD, statementSource, timeRemainingFormatted);
 
 			popularLiveStakesCards.append(html);
 
 		}
-
 
 		// Popular Past Statement Display
 		var indicesOfMaxPastEth = App.findIndicesOfMaxInArray(pastEthStakedArray, numPopularStatementsDisplayed);
@@ -247,13 +258,13 @@ App = {
 	},
 
 
-	collapsingCardHTMLformatLiveData: function(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted) {
+	collapsingCardHTMLformatLiveData: function(statementID, statementText, ethStaked, valueUSD,statementSource, timeRemainingFormatted) {
 
 		var html = `<div class="card bg-transparent border-0 mb-3" id="card${statementID}">
 		                
 		                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
 		                    <button class="btn-default border-0 bg-light">
-		                    	<abbr class="text-center lead text-primary">${ethStaked} eth</abbr>
+		                    	<abbr class="text-center lead text-primary">${ethStaked} eth ${valueUSD}</abbr>
 		                      	<p class="font-weight-light">${statementText}</p>
 		                    </button>
 		                </div>
