@@ -209,7 +209,7 @@ App = {
 			// Stake statistics: num stakes or average stake size
 			
 
-			var html = App.collapsingCardHTMLformatLiveData(statementID, statementText, ethStaked, valueUSD, statementSource, timeRemainingFormatted);
+			var html = App.collapsingCardHTMLformatLiveData(statementID, statementText, numStakes, ethStaked, valueUSD, statementSource, timeRemainingFormatted);
 
 			popularLiveStakesCards.append(html);
 
@@ -244,7 +244,7 @@ App = {
 				var verdict = "False"
 			}
 
-			var html = App.collapsingCardHTMLformatPastData(statementID, statementText, ethStaked, statementSource, stakeEndTime, verdict);
+			var html = App.collapsingCardHTMLformatPastData(statementID, statementText, numStakes, ethStaked, statementSource, stakeEndTime, verdict);
 
 
 			popularPastStakesCards.append(html);
@@ -258,7 +258,7 @@ App = {
 	},
 
 
-	collapsingCardHTMLformatLiveData: function(statementID, statementText, ethStaked, valueUSD,statementSource, timeRemainingFormatted) {
+	collapsingCardHTMLformatLiveData: function(statementID, statementText, numStakes, ethStaked, valueUSD,statementSource, timeRemainingFormatted) {
 
 		var html = `<div class="card bg-transparent border-0 mb-3" id="card${statementID}">
 		                
@@ -332,7 +332,7 @@ App = {
 
 	},
 
-	collapsingCardHTMLformatPastData: function(statementID, statementText, ethStaked, statementSource, stakeEndTime, verdict) {
+	collapsingCardHTMLformatPastData: function(statementID, statementText, numStakes, ethStaked, statementSource, stakeEndTime, verdict) {
 		var html = `<div class="card bg-transparent border-0 mb-3" id="card${statementID}">
 		                
 		                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
@@ -348,12 +348,16 @@ App = {
 
 			                <div class="card-body text-center">
 
-			                
+			                	<div>
+			                		<p>
+			                			Total Number of Stakes: ${numStakes}
+			                		</p>
+			                	</div>
+
 					            <br/>
 			                    <div class="text-center my-auto">
 			                    	<small class="text-muted">source: <a href="https://www.google.com/search?q=${statementSource}" target="_blank"> ${statementSource}</a></small>
 			                    </div>
-
 
 			                </div>
 

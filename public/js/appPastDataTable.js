@@ -138,7 +138,7 @@ App = {
 					var verdict = "False"
 				}
 
-				var cardHtml = App.collapsingCardHTMLformatPastData(statementID, statementText, ethStaked, statementSource, stakeEndTime, verdict);
+				var cardHtml = App.collapsingCardHTMLformatPastData(statementID, statementText, numStakes, ethStaked, statementSource, stakeEndTime, verdict);
 				var ethStakedHtml = `<div class="container" class="stake-table-eth text-center">
 										<h3>${ethStaked}</h3> 
 										<h4>ETH</h4>
@@ -169,36 +169,40 @@ App = {
 
 	},
 
-	collapsingCardHTMLformatPastData: function(statementID, statementText, ethStaked, statementSource, stakeEndTime, verdict) {
+	collapsingCardHTMLformatPastData: function(statementID, statementText, numStakes, ethStaked, statementSource, stakeEndTime, verdict) {
+		var html = `<div class="card bg-transparent border-0 mb-3" id="card${statementID}">
+		                
+		                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
+		                    <button class="btn-default border-0 bg-light">
+		                    	<abbr class="text-center lead text-primary">${ethStaked} eth</abbr>
+			                    <p class="stake-table-statement font-weight-light lead">${statementText}</p>
+			                    <p class="">Verdict: <b>${verdict}</b></p>
+		                    </button>
+		                </div>
 
-		var html = `<td data-order="${stakeEndTime}">
-						<div class="card bg-transparent border-0 mb-3" id="card${statementID}">
-			                
-			                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
-			                    <button class="btn-default border-0 bg-light">
-			                      	<p class="stake-table-statement font-weight-light lead">${statementText}</p>
-			                      	<p class="">Verdict: <b>${verdict}</b></p>
-			                    </button>
+
+		                <div class="card-body collapse" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}">
+
+			                <div class="card-body text-center">
+
+			                	<div>
+			                		<p>
+			                			Total Number of Stakes: ${numStakes}
+			                		</p>
+			                	</div>
+
+					            <br/>
+			                    <div class="text-center my-auto">
+			                    	<small class="text-muted">source: <a href="https://www.google.com/search?q=${statementSource}" target="_blank"> ${statementSource}</a></small>
+			                    </div>
+
 			                </div>
 
+		            	<hr/>
 
-			                <div class="card-body collapse" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}" data-parent="#pastStatementsAccordionTable">
+		                </div>
 
-				                <div class="card-body text-center">
-						            <br/>
-
-				                    <div class="text-center my-auto">
-				                    	<small class="text-muted">source: <a href="https://www.google.com/search?q=${statementSource}" target="_blank"> ${statementSource}</a></small>
-				                    </div>
-
-				                </div>
-
-			            	<hr/>
-
-			                </div>
-
-			            </div>
-			        </td>`
+		            </div>`
 
 		return html
 	},
