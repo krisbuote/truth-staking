@@ -568,21 +568,27 @@ a:focus, a:hover {
 
 /*SVG ICON SYSTEM*/
 .icon {
-    display: inline-flex;
-    align-self: center;
+  display: inline-flex;
+  align-self: center;
 }
 
 .icon svg, .icon img {
-    height: 1em;
-    width: 1em;
-    fill: currentColor;
+  height: 1em;
+  width: 1em;
+  fill: currentColor;
 }
 
 .icon.baseline svg, .icon img {
-    top: .125em;
-    position: relative;
+  top: .125em;
+  position: relative;
 }
 
+.white-link {
+  color: white;
+}
+.white-link:hover {
+  color: #C0C0C0;
+}
 footer {
   padding: 5rem 0;
 }

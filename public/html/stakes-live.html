@@ -92,7 +92,11 @@
 
   
     <div id="loader" class="blockchain-loader bg-light">
-      <p class="text-center bg-light">Contacting blockchain...</p>
+      <p class="text-center bg-light">
+        Contacting blockchain...
+        <br>
+        Mobile viewer under construction.
+      </p>
     </div> 
     
     <div id="blockchain-content bg-light">
@@ -113,7 +117,7 @@
     <section id="new-claim" class="signup-section text-white">
       <div class="container">
         <h2 class="text-center display-4">Submit New Claim</h2>
-        <p class="text-center">earn double the reward for submitting a new claim</p>
+        <p class="text-center"><a class="white-link" href="./about/#FAQ-anchor">earn the Market Maker's reward for submitting a new claim</a></p>
         <br/>
         <form onSubmit="App.makeNewStatement(newStatementString, newStatementPosition, newStatementStakingPeriod, newStatementSource, newStatementStakeValue); return false;">
           <div class="text-right">

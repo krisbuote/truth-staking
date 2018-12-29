@@ -132,8 +132,14 @@ App = {
 				liveEthSum += Number(ethStaked);
 
 				var timeRemainingSeconds = stakeEndTime - Math.floor(Date.now()/1000);
-				var timeRemainingFormatted = App.secondsToDhm(timeRemainingSeconds);
 
+				if (timeRemainingSeconds > 0) {
+					var timeRemainingFormatted = App.secondsToDhm(timeRemainingSeconds);
+				}
+				else {
+					var timeRemainingFormatted = "FINISHED"
+				}
+				
 				var cardHtml = App.collapsingCardHTMLformatLiveData(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted);
 				var ethStakedHtml = `<div class="container" class="stake-table-eth text-center">
 										<h3>${ethStaked}</h3> 

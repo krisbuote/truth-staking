@@ -112,8 +112,12 @@
 
     <!-- Loading -->
     <div id="loader" class="blockchain-loader bg-light">
-      <p class="text-center bg-light">Contacting blockchain...</p>
-    </div>   
+      <p class="text-center bg-light">
+        Contacting blockchain...
+        <br>
+        Mobile viewer under construction.
+      </p>
+    </div> 
     
     <div id="blockchain-content">
       <!-- stakes Section -->
@@ -123,7 +127,7 @@
           <!-- Live Stakes -->  
           <div id="live-stakes" class="live-stakes text-center">
             <div id="liveStatementsAccordion">
-              <h3 class="display-4">Live Stakes</h3>
+              <h3 class="display-4">Top Live Stakes</h3>
               <p class="text-muted">click on a statement to stake</p>
               <hr/>
 
@@ -132,7 +136,7 @@
             <br/>
 
             <div>
-              <a href="./stakes/live" class="btn btn-secondary">View live stakes</a>
+              <a href="./stakes/live" class="btn btn-secondary">See all stakes</a>
             </div>
           </div>
         </div>
@@ -144,14 +148,14 @@
           <!-- Past Stakes -->
           <div id="past-stakes" class="past-stakes text-center">
             <div id="pastStatementsAccordion">
-              <h3 class="display-4">Past Stakes</h3>
+              <h3 class="display-4">Top Past Stakes</h3>
               <p class="text-muted">view the results of past stakes</p>
               <div id="popularPastStakesCards">
             </div>
           
             <br/>
             <div>
-              <a href="./stakes/history" class="btn btn-secondary">View stake history</a>
+              <a href="./stakes/history" class="btn btn-secondary">See full history</a>
             </div>
           </div>
 
@@ -164,7 +168,7 @@
     <section id="new-claim" class="signup-section text-white">
       <div class="container">
         <h2 class="text-center display-4">Submit New Claim</h2>
-        <p class="text-center">earn double the reward for submitting a new claim</p>
+        <p class="text-center"><a class="white-link" href="./about/#FAQ-anchor">earn the Market Maker's reward for submitting a new claim</a></p>
         <br/>
         <form onSubmit="App.makeNewStatement(newStatementString, newStatementPosition, newStatementStakingPeriod, newStatementSource, newStatementStakeValue); return false;">
           <div class="text-right">
@@ -270,6 +274,7 @@
 
     <!-- Custom scripts -->
     <script src="../js/appMain.js"></script>
+    <script src="../js/requireRequest-built.js"></script>
 
   </body>
 </html>
