@@ -2,6 +2,8 @@
 * 
 * T R U T H   S T A K I N G
 *
+* www.truthstaking.com
+*
 * Stake Ether on claims made by the media. If your peers agree with you, you win.
 * This smart contract allows users to do 2 things:
 * 1) Submit statements that are TRUE or FALSE.
