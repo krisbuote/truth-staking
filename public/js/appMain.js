@@ -101,6 +101,8 @@ App = {
 		    }
 
 		});
+
+		
 	
 	},
 
@@ -170,12 +172,21 @@ App = {
 		var popularLiveStakesCards = $("#popularLiveStakesCards");
 		popularLiveStakesCards.empty();
 
-		// MetaMask check. if they are not using MetaMask, the button is a popover to inform them
+		// MetaMask check. if they are not using MetaMask, the Stake and newStatement buttons are popovers to inform them
+		// default is assuming metamask is logged in
 		var stakeButtonHTML = `<button class="btn btn-stake text-center" type="submit">Stake</button>`
+		var newStatementButtonHTML = `<button id="newStatementSubmit" type="submit" class="btn btn-primary float-right">Submit</button>`
+
 		if (App.account == null || App.account == '0x0') {
-			var stakeButtonHTML =`<button type="button" class="btn btn-stake text-center" data-toggle="popover" data-placement="bottom" 
-									data-content="Truth Staking uses <a href='https://metamask.io/'>MetaMask</a> to secure your transactions. <br><br>If you have MetaMask installed, please sign in and refresh the page." data-html="true">Stake</button>`					
+			stakeButtonHTML =`<button type="button" class="btn btn-stake text-center" data-toggle="popover" data-placement="bottom" 
+									data-content="Truth Staking uses <a href='https://metamask.io/'>MetaMask</a> to secure your transactions. 
+									<br><br>If you have MetaMask installed, please sign in and refresh the page." data-html="true">Stake</button>`	
+
+			newStatementButtonHTML = `<button type="button" class="btn btn-primary float-right" data-toggle="popover" data-placement="bottom" 
+									data-content="Truth Staking uses <a href='https://metamask.io/'>MetaMask</a> to secure your submissions. 
+									<br><br>If you have MetaMask installed, please sign in and refresh the page." data-html="true">Submit</button>`	
 		}
+		$("#newStatementButton").html(newStatementButtonHTML);
 
 		// get statement data
 		for (let s=0; s<numPopularStatementsDisplayed; s++) {
@@ -304,7 +315,7 @@ App = {
 
 									    <div class="form-group row">
 									    	<div class="col-md-4 offset-md-4">
-										    	<input class="form-control text-center" type="number" id="stakeValue${statementID}" placeholder="0.750 ether" step="0.000001"/>
+										    	<input class="form-control text-center" type="number" id="stakeValue${statementID}" placeholder="0.750 ether" step="0.00001"/>
 											</div>
 										</div>
 
@@ -399,17 +410,14 @@ App = {
 	    }
 
 		else if (!newStatementString){	
-			console.log("Please complete the form.");
 			alert("You must enter the statement first.");
 		}
 
 		else if (!newStatementPosition){	
-			console.log("Please complete the form.");
 			alert("You must choose true or false.");
 		}
 
 		else if (!newStatementStakeValue){	
-			console.log("Please complete the form.");
 			alert("You must enter the initial stake.");
 		}
 
@@ -423,8 +431,7 @@ App = {
 			var contractInstance = App.truthStakingContract.at(contractAddress);
 			contractInstance.newStatement(newStatementString, newStatementPosition, newStatementStakingPeriod, newStatementSource, txObject, function(err, result) {
 				if(!err) {
-					alert("Success!");
-					console.log("makeNewStatement success! tx hash:", result);
+					alert("Success! tx hash:", result)
 				}
 				else {
 					console.error(err);

@@ -111,12 +111,21 @@ App = {
 		var liveStatementsData = [];
 		var liveEthSum = 0;
 
-		// MetaMask check. if they are not using MetaMask, the button is a popover to inform them
+		// MetaMask check. if they are not using MetaMask, the Stake and newStatement buttons are popovers to inform them
+		// default is assuming metamask is logged in
 		var stakeButtonHTML = `<button class="btn btn-stake text-center" type="submit">Stake</button>`
+		var newStatementButtonHTML = `<button id="newStatementSubmit" type="submit" class="btn btn-primary float-right">Submit</button>`
+
 		if (App.account == null || App.account == '0x0') {
-			var stakeButtonHTML =`<button type="button" class="btn btn-stake text-center" data-toggle="popover" data-placement="bottom" 
-									data-content="Truth Staking uses <a href='https://metamask.io/'>MetaMask</a> to secure your transactions. <br><br>If you have MetaMask installed, please sign in and refresh the page." data-html="true">Stake</button>`					
+			stakeButtonHTML =`<button type="button" class="btn btn-stake text-center" data-toggle="popover" data-placement="bottom" 
+									data-content="Truth Staking uses <a href='https://metamask.io/'>MetaMask</a> to secure your transactions. 
+									<br><br>If you have MetaMask installed, please sign in and refresh the page." data-html="true">Stake</button>`	
+
+			newStatementButtonHTML = `<button type="button" class="btn btn-primary float-right" data-toggle="popover" data-placement="bottom" 
+									data-content="Truth Staking uses <a href='https://metamask.io/'>MetaMask</a> to secure your submissions. 
+									<br><br>If you have MetaMask installed, please sign in and refresh the page." data-html="true">Submit</button>`	
 		}
+		$("#newStatementButton").html(newStatementButtonHTML);
 
 		for (var i = 0; i < App.allStatementsArray.length; i++) {
 
@@ -176,7 +185,7 @@ App = {
 		$("#loader").hide();
 	    $("#blockchain-content").show();
 
-	    	// enable popovers
+	    // enable popovers
   		$('[data-toggle="popover"]').popover({html:true});
 
 	},

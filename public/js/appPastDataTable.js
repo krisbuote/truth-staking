@@ -111,6 +111,18 @@ App = {
 		var pastStatementsData = [];
 		var pastEthSum = 0;
 
+		// MetaMask check. if they are not using MetaMask, the newStatement buttons is a popover to inform them
+		// default is assuming metamask is logged in
+		var newStatementButtonHTML = `<button id="newStatementSubmit" type="submit" class="btn btn-primary float-right">Submit</button>`
+
+		if (App.account == null || App.account == '0x0') {
+			newStatementButtonHTML = `<button type="button" class="btn btn-primary float-right" data-toggle="popover" data-placement="bottom" 
+									data-content="Truth Staking uses <a href='https://metamask.io/'>MetaMask</a> to secure your submissions. 
+									<br><br>If you have MetaMask installed, please sign in and refresh the page." data-html="true">Submit</button>`	
+		}
+
+		$("#newStatementButton").html(newStatementButtonHTML);
+
 		for (var i = 0; i < App.allStatementsArray.length; i++) {
 
 			var statement = App.allStatementsArray[i];
@@ -164,8 +176,12 @@ App = {
 	        responsive: true
 	    });
 
-	    $("#loader").hide();
+  		//show content
+		$("#loader").hide();
 	    $("#blockchain-content").show();
+
+	    // enable popovers
+  		$('[data-toggle="popover"]').popover({html:true});
 
 	},
 
