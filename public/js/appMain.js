@@ -170,7 +170,12 @@ App = {
 		var popularLiveStakesCards = $("#popularLiveStakesCards");
 		popularLiveStakesCards.empty();
 
-
+		// MetaMask check. if they are not using MetaMask, the button is a popover to inform them
+		var stakeButtonHTML = `<button class="btn btn-stake text-center" type="submit">Stake</button>`
+		if (App.account == null || App.account == '0x0') {
+			var stakeButtonHTML =`<button type="button" class="btn btn-stake text-center" data-toggle="popover" data-placement="bottom" 
+									data-content="Truth Staking uses <a href='https://metamask.io/'>MetaMask</a> to secure your transactions. <br><br>If you have MetaMask installed, please sign in and refresh the page." data-html="true">Stake</button>`					
+		}
 
 		// get statement data
 		for (let s=0; s<numPopularStatementsDisplayed; s++) {
@@ -205,11 +210,8 @@ App = {
 			else {
 				var valueUSD = '($' + Math.round(App.priceUSD*ethStaked) + ')';
 			}
-
-			// Stake statistics: num stakes or average stake size
 			
-
-			var html = App.collapsingCardHTMLformatLiveData(statementID, statementText, numStakes, ethStaked, valueUSD, statementSource, timeRemainingFormatted);
+			var html = App.collapsingCardHTMLformatLiveData(statementID, statementText, numStakes, ethStaked, valueUSD, statementSource, timeRemainingFormatted, stakeButtonHTML);
 
 			popularLiveStakesCards.append(html);
 
@@ -252,13 +254,17 @@ App = {
 
 		}
 
+		// enable popovers
+  		$('[data-toggle="popover"]').popover({html:true});
+
+  		//show content
 		$("#loader").hide();
 	    $("#blockchain-content").show();
 
 	},
 
 
-	collapsingCardHTMLformatLiveData: function(statementID, statementText, numStakes, ethStaked, valueUSD,statementSource, timeRemainingFormatted) {
+	collapsingCardHTMLformatLiveData: function(statementID, statementText, numStakes, ethStaked, valueUSD,statementSource, timeRemainingFormatted, stakeButtonHTML) {
 
 		var html = `<div class="card bg-transparent border-0 mb-3" id="card${statementID}">
 		                
@@ -301,12 +307,12 @@ App = {
 										    	<input class="form-control text-center" type="number" id="stakeValue${statementID}" placeholder="0.750 ether" step="0.000001"/>
 											</div>
 										</div>
+
 										<div class="form-group row">
 											<div class="col-md-4 offset-md-4">
-												<button class="btn btn-stake text-center" type="submit">Stake</button>
+												${stakeButtonHTML}
 											</div>
 										</div>
-
 									</div>
 
 					            </form>
@@ -504,7 +510,6 @@ App = {
 	}
 
 
-
 }
 
 
@@ -515,3 +520,4 @@ $(function() {
     App.init();
   });
 });
+

@@ -111,6 +111,13 @@ App = {
 		var liveStatementsData = [];
 		var liveEthSum = 0;
 
+		// MetaMask check. if they are not using MetaMask, the button is a popover to inform them
+		var stakeButtonHTML = `<button class="btn btn-stake text-center" type="submit">Stake</button>`
+		if (App.account == null || App.account == '0x0') {
+			var stakeButtonHTML =`<button type="button" class="btn btn-stake text-center" data-toggle="popover" data-placement="bottom" 
+									data-content="Truth Staking uses <a href='https://metamask.io/'>MetaMask</a> to secure your transactions. <br><br>If you have MetaMask installed, please sign in and refresh the page." data-html="true">Stake</button>`					
+		}
+
 		for (var i = 0; i < App.allStatementsArray.length; i++) {
 
 			var statement = App.allStatementsArray[i];
@@ -140,7 +147,7 @@ App = {
 					var timeRemainingFormatted = "FINISHED"
 				}
 				
-				var cardHtml = App.collapsingCardHTMLformatLiveData(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted);
+				var cardHtml = App.collapsingCardHTMLformatLiveData(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted, stakeEndTime, stakeButtonHTML);
 				var ethStakedHtml = `<div class="container" class="stake-table-eth text-center">
 										<h3>${ethStaked}</h3> 
 										<h4>ETH</h4>
@@ -165,12 +172,16 @@ App = {
 	        responsive: true
 	    });
 
-	    $("#loader").hide();
+  		//show content
+		$("#loader").hide();
 	    $("#blockchain-content").show();
+
+	    	// enable popovers
+  		$('[data-toggle="popover"]').popover({html:true});
 
 	},
 
-	collapsingCardHTMLformatLiveData: function(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted, stakeEndTime) {
+	collapsingCardHTMLformatLiveData: function(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted, stakeEndTime,stakeButtonHTML) {
 
 		var html = `<td data-order="${stakeEndTime}">
 						<div class="card bg-transparent border-0 mb-3" id="card${statementID}">
@@ -213,7 +224,7 @@ App = {
 											</div>
 											<div class="form-group row">
 												<div class="col-md-4 offset-md-4">
-													<button class="btn btn-stake text-center" type="submit">Stake</button>
+													${stakeButtonHTML}
 												</div>
 											</div>
 
