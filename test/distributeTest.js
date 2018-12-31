@@ -65,7 +65,7 @@ contract("TruthStaking", function(accounts) {
 	it("allow endStake() on valid statementID for ended stake", function() {
 		return TruthStaking.deployed().then(function(instance) {
 			TruthStakingInstance = instance;
-			wait(60000);
+			wait(90000);
 			return TruthStakingInstance.endStake(0);
 		}).then(function(result) {
 			// console.log(result);
