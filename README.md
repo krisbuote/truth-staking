@@ -41,5 +41,5 @@ A decentralized application that allows the crowd to stake money on the truthful
 + if making a transaction with metamask and tx nonce is mismatched from ganache network's tx nonce, reset your account in metamask:
 https://consensys.zendesk.com/hc/en-us/articles/360004177531-Resetting-an-Account-New-UI-
 
-### Sample Prototype
-![crow prototype](https://github.com/krisbuote/crow/blob/master/src/images/prototype_interface.PNG "Sample prototype")
+### Stuff
++ Provide pre-filtered datatable search by using truthstaking.com/stakes/live/#dataTableID=fWords%20of%20Interest  

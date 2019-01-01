@@ -425,7 +425,7 @@ App = {
 			var contractInstance = App.truthStakingContract.at(contractAddress);
 			contractInstance.newStatement(newStatementString, newStatementPosition, newStatementStakingPeriod, newStatementSource, txObject, function(err, result) {
 				if(!err) {
-					alert("Success! tx hash:", result)
+					alert("Success! tx hash:", result);
 				}
 				else {
 					console.error(err);
