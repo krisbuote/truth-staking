@@ -2,6 +2,7 @@ const Web3 = require('web3');
 const contractAddress = '0x3c02dac293EC087EF59ee4De0F50354b0B062DD3'
 const contractABI = [{"constant":false,"inputs":[{"name":"_newServiceFeeTenThousandths","type":"uint256"}],"name":"setServiceFeeTenThousandths","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"absNumStatements","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"beneficiaryAddresses","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_statementID","type":"uint256"}],"name":"endStake","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_confirm","type":"bytes"}],"name":"SELF_DESTRUCT","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"absEthStaked","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"serviceFeeTenThousandths","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_statementID","type":"uint256"},{"name":"_position","type":"uint256"}],"name":"stake","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"_beneficiaryAddress","type":"address"},{"name":"_beneficiaryShareTenThousandths","type":"uint256"}],"name":"addBeneficiary","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"statements","outputs":[{"name":"id","type":"uint256"},{"name":"statement","type":"string"},{"name":"stakeDuration","type":"uint256"},{"name":"stakeBeginningTime","type":"uint256"},{"name":"stakeEndTime","type":"uint256"},{"name":"marketMaker","type":"address"},{"name":"numStakes","type":"uint256"},{"name":"ethStaked","type":"uint256"},{"name":"stakeEnded","type":"bool"},{"name":"source","type":"string"},{"name":"verdict","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_index","type":"uint256"},{"name":"_beneficiaryAddress","type":"address"}],"name":"removeBeneficiary","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"beneficiaryShares","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_newPctTimeRemainingThreshold","type":"uint256"},{"name":"_newMinTimeAddPct","type":"uint256"},{"name":"_newMaxTimeAddPct","type":"uint256"},{"name":"_newMinPotPctThreshold","type":"uint256"},{"name":"_newMaxPotPctThreshold","type":"uint256"}],"name":"setAddTimeParameters","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_statement","type":"string"},{"name":"_position","type":"uint256"},{"name":"_stakeDuration","type":"uint256"},{"name":"_source","type":"string"}],"name":"newStatement","outputs":[{"name":"statementID","type":"uint256"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"_newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"absNumStakes","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"statementID","type":"uint256"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"NewStake","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"statementID","type":"uint256"},{"indexed":false,"name":"TruePotFinal","type":"uint256"},{"indexed":false,"name":"FalsePotFinal","type":"uint256"},{"indexed":false,"name":"winningPosition","type":"uint256"},{"indexed":false,"name":"numStakes","type":"uint256"}],"name":"StakeEnded","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"statementID","type":"uint256"},{"indexed":false,"name":"totalPot","type":"uint256"}],"name":"CurrentPot","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"statementID","type":"uint256"},{"indexed":false,"name":"statement","type":"string"},{"indexed":false,"name":"stakeEndTime","type":"uint256"},{"indexed":false,"name":"source","type":"string"}],"name":"NewStatement","type":"event"}]
 
+
 App = {
 	web3Provider: null,
 	contracts: {},
@@ -51,28 +52,12 @@ App = {
 	    // Instantiate contract instance
 		var contractInstance = App.truthStakingContract.at(contractAddress);
 
-		// Display the total Ether staked so far
-		contractInstance.absEthStaked(function(error, absEthStaked) {
-		   if(!error) {
-      			$("#absEthStaked").html((absEthStaked.toNumber()/10**18).toFixed(3));
-			}
-		   else {
-		        console.error(error);
-			}
-		});
-
-
 		// Build data table out of live statements
 		contractInstance.absNumStatements(function(error, _numStatements){ 
 
 			if(!error) {
-				var numStatements = _numStatements.toNumber();
-
 				App.allStatementsArray = [];
-
-				for (var i = 0; i < numStatements; i++) {
-					App.getStatementDataAndBuildLiveTable(i, numStatements, contractInstance);
-				}
+				App.getStatementDataAndBuildLiveTable(_numStatements.toNumber(), contractInstance);
 			}
 
 			else {
@@ -85,22 +70,34 @@ App = {
 
 	
 
-	getStatementDataAndBuildLiveTable: function(_index, _numStatements, _contractInstance) {
-		// Queries blockchain for statement data
-		_contractInstance.statements(_index, function(error, statement) {
+	getStatementDataAndBuildLiveTable: function(_numStatements, _contractInstance) {
 
-			if(!error){
-				
-				App.allStatementsArray.push(statement); // Push to array
+		App.liveStatementsArray = [];
 
-				if (App.allStatementsArray.length == _numStatements) {
-					App.displayLiveDataTable(); // If all statements collected, build data table
+		for (var i = 0; i < _numStatements; i++) {
+
+			// Queries blockchain for statement data
+			_contractInstance.statements(i, function(error, statement) {
+
+				if(!error){
+					
+					App.allStatementsArray.push(statement); // Push to array
+
+					var stakeEnded = statement[8];
+
+					if (!stakeEnded) {
+						App.liveStatementsArray.push(statement) // if live
+					}
+
+					if (App.allStatementsArray.length == _numStatements) {
+						App.displayLiveDataTable(); // If all statements collected, build data table
+					}
 				}
-			}
 
-			else{console.error(error)}
+				else{console.error(error)}
 
-		});
+			});
+		}
 
 
 	},
@@ -126,9 +123,10 @@ App = {
 		}
 		$("#newStatementButton").html(newStatementButtonHTML);
 
-		for (var i = 0; i < App.allStatementsArray.length; i++) {
 
-			var statement = App.allStatementsArray[i];
+		for (var i = 0; i < App.liveStatementsArray.length; i++) {
+
+			var statement = App.liveStatementsArray[i];
 
 			var statementID = statement[0];
 			var statementText = statement[1];
@@ -140,33 +138,30 @@ App = {
 			var ethStaked = (statement[7] / 10**18).toFixed(3);
 			var stakeEnded = statement[8];
 			var statementSource = statement[9];
-			var verdict = statement[10];
-	
 
-			if (!stakeEnded) {
-				liveEthSum += Number(ethStaked);
 
-				var timeRemainingSeconds = stakeEndTime - Math.floor(Date.now()/1000);
+			liveEthSum += Number(ethStaked);
 
-				if (timeRemainingSeconds > 0) {
-					var timeRemainingFormatted = App.secondsToDhm(timeRemainingSeconds);
-				}
-				else {
-					var timeRemainingFormatted = "FINISHED"
-				}
-				
-				var cardHtml = App.collapsingCardHTMLformatLiveData(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted, stakeEndTime, stakeButtonHTML);
-				var ethStakedHtml = `<div class="container" class="stake-table-eth text-center">
-										<h3>${ethStaked}</h3> 
-										<h4>ETH</h4>
-									</div>`
+			var timeRemainingSeconds = stakeEndTime - Math.floor(Date.now()/1000);
 
-				liveStatementsData.push([ethStakedHtml, cardHtml]);
+			if (timeRemainingSeconds > 0) {
+				var timeRemainingFormatted = App.secondsToDhm(timeRemainingSeconds);
 			}
+			else {
+				var timeRemainingFormatted = "FINISHED"
+			}
+			
+			var cardHtml = App.collapsingCardHTMLformatLiveData(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted, stakeEndTime, stakeButtonHTML);
+			var ethStakedHtml = `<div class="container" class="stake-table-eth text-center">
+									<h3>${ethStaked}</h3> 
+									<h4>ETH</h4>
+								</div>`
 
+			liveStatementsData.push([ethStakedHtml, cardHtml]);
+				
 		}
 
-		$("#liveNumStatements").html(liveStatementsData.length);
+		$("#liveNumStatements").html(App.liveStatementsArray.length);
 		$("#liveEthStaked").html(liveEthSum.toFixed(3));
 
 		// Build Data table

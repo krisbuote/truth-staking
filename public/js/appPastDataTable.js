@@ -7,6 +7,7 @@ App = {
 	contracts: {},
   	truthStakingContract: null,
   	allStatementsArray: [],
+  	pastStatementsArray: [],
   	account: '0x0',
 
 	init: function() {
@@ -69,9 +70,7 @@ App = {
 
 				App.allStatementsArray = [];
 
-				for (var i = 0; i < numStatements; i++) {
-					App.getStatementDataAndBuildPastTable(i, numStatements, contractInstance);
-				}
+				App.getStatementDataAndBuildPastTable(numStatements, contractInstance);
 
 			}
 
@@ -85,22 +84,35 @@ App = {
 
 	
 
-	getStatementDataAndBuildPastTable: function(_index, _numStatements, _contractInstance) {
-		// Queries blockchain for statement data
-		_contractInstance.statements(_index, function(error, statement) {
+	getStatementDataAndBuildPastTable: function(_numStatements, _contractInstance) {
 
-			if(!error){
-				
-				App.allStatementsArray.push(statement); // Push to array
+		App.pastStatementsArray = [];
 
-				if (App.allStatementsArray.length == _numStatements) {
-					App.displayPastDataTable(); // If all statements collected, build data table
+		for (var i = 0; i < _numStatements; i++) {
+
+			// Queries blockchain for statement data
+			_contractInstance.statements(i, function(error, statement) {
+
+				if(!error){
+					
+					App.allStatementsArray.push(statement); // Push to array
+
+					var stakeEnded = statement[8];
+
+					if (stakeEnded) {
+						App.pastStatementsArray.push(statement) // if past
+					}
+
+					if (App.allStatementsArray.length == _numStatements) {
+						App.displayPastDataTable(); // If all statements collected, build data table
+					}
 				}
-			}
 
-			else{console.error(error)}
+				else{console.error(error)}
 
-		});
+			});
+
+		}
 
 
 	},
@@ -122,9 +134,10 @@ App = {
 
 		$("#newStatementButton").html(newStatementButtonHTML);
 
-		for (var i = 0; i < App.allStatementsArray.length; i++) {
+		// For all the past statement data, put it in the data table
+		for (var i = 0; i < App.pastStatementsArray.length; i++) {
 
-			var statement = App.allStatementsArray[i];
+			var statement = App.pastStatementsArray[i];
 		  	
 			var statementID = statement[0];
 			var statementText = statement[1];
@@ -138,25 +151,24 @@ App = {
 			var statementSource = statement[9];
 			var verdictNum = statement[10];
 
-			// If it belongs in Past Data table
-			if (stakeEnded) {
-				pastEthSum += Number(ethStaked);
 
-				if (verdictNum == 1) {
-					var verdict = "True"
-				}
-				else {
-					var verdict = "False"
-				}
+			pastEthSum += Number(ethStaked);
 
-				var cardHtml = App.collapsingCardHTMLformatPastData(statementID, statementText, numStakes, ethStaked, statementSource, stakeEndTime, verdict);
-				var ethStakedHtml = `<div class="container" class="stake-table-eth text-center">
-										<h3>${ethStaked}</h3> 
-										<h4>ETH</h4>
-									</div>`
-
-				pastStatementsData.push([ethStakedHtml, cardHtml]);
+			if (verdictNum == 1) {
+				var verdict = "True"
 			}
+			else {
+				var verdict = "False"
+			}
+
+			var cardHtml = App.collapsingCardHTMLformatPastData(statementID, statementText, numStakes, ethStaked, statementSource, stakeEndTime, verdict);
+			var ethStakedHtml = `<div class="container" class="stake-table-eth text-center">
+									<h3>${ethStaked}</h3> 
+									<h4>ETH</h4>
+								</div>`
+
+			pastStatementsData.push([ethStakedHtml, cardHtml]);
+			
 
 		}
 
@@ -189,7 +201,6 @@ App = {
 		                
 		                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
 		                    <button class="btn-default border-0 bg-light">
-		                    	<abbr class="text-center lead text-primary">${ethStaked} eth</abbr>
 			                    <p class="stake-table-statement font-weight-light lead">${statementText}</p>
 			                    <p class="">Verdict: <b>${verdict}</b></p>
 		                    </button>
