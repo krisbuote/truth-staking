@@ -184,6 +184,7 @@ App = {
 	            { title: "Recent"}
 	        ],
 	        "order": [[ 0, "desc" ]],
+	        keepConditions: true,
 	        responsive: true
 	    });
 

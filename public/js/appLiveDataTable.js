@@ -172,6 +172,7 @@ App = {
 	            { title: "Ending Soon"} 
 	        ],
 	        "order": [[ 0, "desc" ]],
+	        keepConditions: true,
 	        responsive: true
 	    });
 

@@ -236,6 +236,7 @@ App = {
 			var statementSource = statement[9];
 			var verdictNum = statement[10];
 
+			//Verdict
 			if (verdictNum == 1) {
 				var verdict = "True"
 			}
@@ -243,7 +244,15 @@ App = {
 				var verdict = "False"
 			}
 
-			var html = App.collapsingCardHTMLformatPastData(statementID, statementText, numStakes, ethStaked, statementSource, stakeEndTime, verdict);
+			// Value in USD
+			if (App.priceUSD == null) {
+				var valueUSD = '';
+			}
+			else {
+				var valueUSD = '($' + Math.round(App.priceUSD*ethStaked) + ')';
+			}
+
+			var html = App.collapsingCardHTMLformatPastData(statementID, statementText, numStakes, ethStaked, valueUSD, statementSource, stakeEndTime, verdict);
 
 			popularPastStakesCards.append(html);
 
@@ -260,7 +269,7 @@ App = {
 	},
 
 
-	collapsingCardHTMLformatLiveData: function(statementID, statementText, numStakes, ethStaked, valueUSD,statementSource, timeRemainingFormatted, stakeButtonHTML) {
+	collapsingCardHTMLformatLiveData: function(statementID, statementText, numStakes, ethStaked, valueUSD, statementSource, timeRemainingFormatted, stakeButtonHTML) {
 
 		var html = `<div class="card bg-transparent border-0 mb-3" id="card${statementID}">
 		                
@@ -334,12 +343,12 @@ App = {
 
 	},
 
-	collapsingCardHTMLformatPastData: function(statementID, statementText, numStakes, ethStaked, statementSource, stakeEndTime, verdict) {
+	collapsingCardHTMLformatPastData: function(statementID, statementText, numStakes, ethStaked, valueUSD, statementSource, stakeEndTime, verdict) {
 		var html = `<div class="card bg-transparent border-0 mb-3" id="card${statementID}">
 		                
 		                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
 		                    <button class="btn-default border-0 bg-light">
-		                    	<abbr class="text-center lead text-primary">${ethStaked} eth</abbr>
+		                    	<abbr class="text-center lead text-primary">${ethStaked} eth ${valueUSD}</abbr>
 			                    <p class="stake-table-statement font-weight-light lead">${statementText}</p>
 			                    <p class="">Verdict: <b>${verdict}</b></p>
 		                    </button>
