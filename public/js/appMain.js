@@ -462,7 +462,7 @@ App = {
 			var contractInstance = App.truthStakingContract.at(contractAddress);
 		    contractInstance.stake.sendTransaction(statementIdToStake, stakePosition, txObject, function(error, result) {
 		    	if(!error) {
-		    		console.log('makeStake() success: ',result);
+		    		console.log('Stake success! tx hash: ',result);
 		    		App.successTxHash(result);
 		    	}
 
@@ -507,9 +507,10 @@ App = {
 
 	successTxHash: function(tx) {
 		var s = "Success! tx hash: " + String(tx);
-		alert(s);
+		// Alert user and then reload on OK
+		if(alert(s)){}
+		else    window.location.reload();
 	}
-
 
 }
 

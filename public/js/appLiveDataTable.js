@@ -271,7 +271,7 @@ App = {
 		}
 
 		if (!newStatementStakingPeriod) {
-			newStatementStakingPeriod = 7*24*60*60 // default to 7 days 
+			newStatementStakingPeriod = 7*24*60*60 // default to 7 days stake if left empty
 		}
 
 
@@ -304,8 +304,8 @@ App = {
 			var contractInstance = App.truthStakingContract.at(contractAddress);
 			contractInstance.newStatement(newStatementString, newStatementPosition, newStatementStakingPeriod, newStatementSource, txObject, function(err, result) {
 				if(!err) {
-					alert("Success!");
 					console.log("makeNewStatement success! tx hash:", result);
+					App.successTxHash(result);
 				}
 				else {
 					console.error(err);
@@ -342,7 +342,7 @@ App = {
 			var contractInstance = App.truthStakingContract.at(contractAddress);
 		    contractInstance.stake.sendTransaction(statementIdToStake, stakePosition, txObject, function(error, result) {
 		    	if(!error) {
-		    		console.log('makeStake() success: ',result);
+		    		console.log('makeStake() success. tx hash: ',result);
 		    		App.successTxHash(result);
 		    	}
 
@@ -377,7 +377,9 @@ App = {
 
 	successTxHash: function(tx) {
 		var s = "Success! tx hash: " + String(tx);
-		alert(s);
+		// Alert user and then reload on OK
+		if(alert(s)){}
+		else    window.location.reload();
 	}
 
 

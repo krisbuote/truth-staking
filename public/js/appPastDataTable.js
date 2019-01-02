@@ -352,7 +352,9 @@ App = {
 
 	successTxHash: function(tx) {
 		var s = "Success! tx hash: " + String(tx);
-		alert(s);
+		// Alert user and then reload on OK
+		if(alert(s)){}
+		else    window.location.reload();
 	}
 
 
