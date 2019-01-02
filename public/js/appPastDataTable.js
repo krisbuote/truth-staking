@@ -351,8 +351,7 @@ App = {
 	},
 
 	successTxHash: function(tx) {
-		var s = "Success! tx hash: " + String(tx);
-		// alert(s);
+		var s = "Success! View your transaction on the blockchain at \n https://ropsten.etherscan.io/tx/" + String(tx);
 		// Alert user and then reload on OK
 		if(alert(s)){}
 		else    window.location.reload();
