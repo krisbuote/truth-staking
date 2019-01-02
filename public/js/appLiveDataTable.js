@@ -52,28 +52,12 @@ App = {
 	    // Instantiate contract instance
 		var contractInstance = App.truthStakingContract.at(contractAddress);
 
-		// Display the total Ether staked so far
-		contractInstance.absEthStaked(function(error, absEthStaked) {
-		   if(!error) {
-      			$("#absEthStaked").html((absEthStaked.toNumber()/10**18).toFixed(3));
-			}
-		   else {
-		        console.error(error);
-			}
-		});
-
-
 		// Build data table out of live statements
 		contractInstance.absNumStatements(function(error, _numStatements){ 
 
 			if(!error) {
-				var numStatements = _numStatements.toNumber();
-
 				App.allStatementsArray = [];
-
-				for (var i = 0; i < numStatements; i++) {
-					App.getStatementDataAndBuildLiveTable(i, numStatements, contractInstance);
-				}
+				App.getStatementDataAndBuildLiveTable(_numStatements.toNumber(), contractInstance);
 			}
 
 			else {
@@ -86,22 +70,34 @@ App = {
 
 	
 
-	getStatementDataAndBuildLiveTable: function(_index, _numStatements, _contractInstance) {
-		// Queries blockchain for statement data
-		_contractInstance.statements(_index, function(error, statement) {
+	getStatementDataAndBuildLiveTable: function(_numStatements, _contractInstance) {
 
-			if(!error){
-				
-				App.allStatementsArray.push(statement); // Push to array
+		App.liveStatementsArray = [];
 
-				if (App.allStatementsArray.length == _numStatements) {
-					App.displayLiveDataTable(); // If all statements collected, build data table
+		for (var i = 0; i < _numStatements; i++) {
+
+			// Queries blockchain for statement data
+			_contractInstance.statements(i, function(error, statement) {
+
+				if(!error){
+					
+					App.allStatementsArray.push(statement); // Push to array
+
+					var stakeEnded = statement[8];
+
+					if (!stakeEnded) {
+						App.liveStatementsArray.push(statement) // if live
+					}
+
+					if (App.allStatementsArray.length == _numStatements) {
+						App.displayLiveDataTable(); // If all statements collected, build data table
+					}
 				}
-			}
 
-			else{console.error(error)}
+				else{console.error(error)}
 
-		});
+			});
+		}
 
 
 	},
@@ -127,9 +123,10 @@ App = {
 		}
 		$("#newStatementButton").html(newStatementButtonHTML);
 
-		for (var i = 0; i < App.allStatementsArray.length; i++) {
 
-			var statement = App.allStatementsArray[i];
+		for (var i = 0; i < App.liveStatementsArray.length; i++) {
+
+			var statement = App.liveStatementsArray[i];
 
 			var statementID = statement[0];
 			var statementText = statement[1];
@@ -141,33 +138,30 @@ App = {
 			var ethStaked = (statement[7] / 10**18).toFixed(3);
 			var stakeEnded = statement[8];
 			var statementSource = statement[9];
-			var verdict = statement[10];
-	
 
-			if (!stakeEnded) {
-				liveEthSum += Number(ethStaked);
 
-				var timeRemainingSeconds = stakeEndTime - Math.floor(Date.now()/1000);
+			liveEthSum += Number(ethStaked);
 
-				if (timeRemainingSeconds > 0) {
-					var timeRemainingFormatted = App.secondsToDhm(timeRemainingSeconds);
-				}
-				else {
-					var timeRemainingFormatted = "FINISHED"
-				}
-				
-				var cardHtml = App.collapsingCardHTMLformatLiveData(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted, stakeEndTime, stakeButtonHTML);
-				var ethStakedHtml = `<div class="container" class="stake-table-eth text-center">
-										<h3>${ethStaked}</h3> 
-										<h4>ETH</h4>
-									</div>`
+			var timeRemainingSeconds = stakeEndTime - Math.floor(Date.now()/1000);
 
-				liveStatementsData.push([ethStakedHtml, cardHtml]);
+			if (timeRemainingSeconds > 0) {
+				var timeRemainingFormatted = App.secondsToDhm(timeRemainingSeconds);
 			}
+			else {
+				var timeRemainingFormatted = "FINISHED"
+			}
+			
+			var cardHtml = App.collapsingCardHTMLformatLiveData(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted, stakeEndTime, stakeButtonHTML);
+			var ethStakedHtml = `<div class="container" class="stake-table-eth text-center">
+									<h3>${ethStaked}</h3> 
+									<h4>ETH</h4>
+								</div>`
 
+			liveStatementsData.push([ethStakedHtml, cardHtml]);
+				
 		}
 
-		$("#liveNumStatements").html(liveStatementsData.length);
+		$("#liveNumStatements").html(App.liveStatementsArray.length);
 		$("#liveEthStaked").html(liveEthSum.toFixed(3));
 
 		// Build Data table
@@ -348,7 +342,7 @@ App = {
 			var contractInstance = App.truthStakingContract.at(contractAddress);
 		    contractInstance.stake.sendTransaction(statementIdToStake, stakePosition, txObject, function(error, result) {
 		    	if(!error) {
-		    		console.log('makeStake() success: ',result);
+		    		console.log('Stake success. tx hash: ',result);
 		    		App.successTxHash(result);
 		    	}
 
@@ -383,7 +377,10 @@ App = {
 
 	successTxHash: function(tx) {
 		var s = "Success! tx hash: " + String(tx);
-		alert(s);
+		// alert(s);
+		// Alert user and then reload on OK
+		if(alert(s)){}
+		else    window.location.reload();
 	}
 
 
