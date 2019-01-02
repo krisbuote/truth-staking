@@ -321,6 +321,7 @@ App = {
 									</div>
 
 					            </form>
+					            
 					            <br/>
 
 			                  	<div class="text-center my-auto">
@@ -425,7 +426,9 @@ App = {
 			var contractInstance = App.truthStakingContract.at(contractAddress);
 			contractInstance.newStatement(newStatementString, newStatementPosition, newStatementStakingPeriod, newStatementSource, txObject, function(err, result) {
 				if(!err) {
-					alert("Success! tx hash:", result);
+					console.log("makeNewStatement() Success! tx hash:", result);
+					var modalID = '#statementSubmitModal';
+		    		App.statementSuccessTxHash(modalID, result);
 				}
 				else {
 					console.error(err);
@@ -462,8 +465,8 @@ App = {
 			var contractInstance = App.truthStakingContract.at(contractAddress);
 		    contractInstance.stake.sendTransaction(statementIdToStake, stakePosition, txObject, function(error, result) {
 		    	if(!error) {
-		    		console.log('Stake success! tx hash: ',result);
-		    		App.successTxHash(result);
+		    		var modalID = '#stakeSubmitModal' + String(_statementID);
+		    		App.stakeSuccessTxHash(modalID, result);
 		    	}
 
 		    	else {
@@ -505,11 +508,34 @@ App = {
 		return dDisplay + hDisplay + mDisplay;
 	},
 
-	successTxHash: function(tx) {
-		var s = "Success! tx hash: " + String(tx);
-		// Alert user and then reload on OK
-		if(alert(s)){}
-		else    window.location.reload();
+	stakeSuccessTxHash: function(_modalID, tx) {
+		var url = "https://etherscan.io/tx/" + String(tx);
+		var s = "View your transaction on the blockchain <a href=" + url + " target='_blank'>here</a>"
+		var modalBody = _modalID + 'Body';
+
+		$(modalBody).html(s);
+
+	  	$(_modalID).modal('show');
+
+	  	$(_modalID).on('hidden.bs.modal', function () {
+		 location.reload();
+		})
+
+	},
+
+	statementSuccessTxHash: function(_modalID, tx) {
+		var url = "https://etherscan.io/tx/" + String(tx);
+		var s = "View your transaction on the blockchain <a href=" + url + " target='_blank'>here</a>"
+		var modalBody = _modalID + 'Body';
+
+		$(modalBody).html(s);
+
+	  	$(_modalID).modal('show');
+
+	  	$(_modalID).on('hidden.bs.modal', function () {
+		 location.reload();
+		})
+
 	}
 
 }
