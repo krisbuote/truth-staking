@@ -150,15 +150,17 @@ App = {
 			else {
 				var timeRemainingFormatted = "FINISHED"
 			}
+
+			var stakeBeginningDate = App.unixToYMD(stakeBeginningTime*1000);
 			
 			var cardHtml = App.collapsingCardHTMLformatLiveData(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted, stakeEndTime, stakeButtonHTML);
 			var ethStakedHtml = `<div class="container" class="stake-table-eth text-center">
 									<h3>${ethStaked}</h3> 
 									<h4>ETH</h4>
-								</div>`
+								</div>`		
 
-			liveStatementsData.push([ethStakedHtml, cardHtml]);
-				
+			liveStatementsData.push([ethStakedHtml, cardHtml, stakeBeginningDate]);
+			
 		}
 
 		$("#liveNumStatements").html(App.liveStatementsArray.length);
@@ -168,8 +170,9 @@ App = {
 		$('#liveStatementTable').DataTable( {
 	        data: liveStatementsData,
 	        columns: [
-	            { title: "Value" },
-	            { title: "Ending Soon"} 
+	            { title: "Value", width: "18%"},
+	            { title: "Statement", width: "64%"},
+	            { title: "Date", width: "18%"} 
 	        ],
 	        "order": [[ 0, "desc" ]],
 	        keepConditions: true,
@@ -185,7 +188,7 @@ App = {
 
 	},
 
-	collapsingCardHTMLformatLiveData: function(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted, stakeEndTime,stakeButtonHTML) {
+	collapsingCardHTMLformatLiveData: function(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted, stakeEndTime, stakeButtonHTML) {
 
 		var html = `<td data-order="${stakeEndTime}">
 						<div class="card bg-transparent border-0 mb-3" id="card${statementID}">
@@ -390,6 +393,22 @@ App = {
 	return dDisplay + hDisplay + mDisplay;
 	
 	},
+
+	unixToYMD: function(unixTimeMS) {
+		var beginningDate = new Date(unixTimeMS);
+		console.log(beginningDate);
+		var beginningYear = beginningDate.getYear() - 100 + 2000;
+		var beginningMonth = beginningDate.getMonth() + 1;
+		var beginningDay = beginningDate.getDate();
+
+		console.log(beginningYear);
+		console.log(beginningMonth);
+		console.log(beginningDay);
+
+
+		return String(beginningYear) + "-" + String(beginningMonth) + "-" + String(beginningDay);
+	},
+	
 	
 	stakeSuccessTxHash: function(_modalID, tx) {
 		var url = "https://etherscan.io/tx/" + String(tx);

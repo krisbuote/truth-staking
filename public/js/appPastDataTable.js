@@ -167,7 +167,9 @@ App = {
 									<h4>ETH</h4>
 								</div>`
 
-			pastStatementsData.push([ethStakedHtml, cardHtml]);
+			var stakeBeginningDate = App.unixToYMD(stakeBeginningTime*1000);
+
+			pastStatementsData.push([ethStakedHtml, cardHtml, stakeBeginningDate]);
 			
 
 		}
@@ -180,8 +182,9 @@ App = {
 		$('#pastStatementTable').DataTable( {
 	        data: pastStatementsData,
 	        columns: [
-	            { title: "Value" },
-	            { title: "Recent"}
+	            { title: "Value", width: "18%"},
+	            { title: "Statement", width: "64%"},
+	            { title: "Date", width: "18%"} 
 	        ],
 	        "order": [[ 0, "desc" ]],
 	        keepConditions: true,
@@ -349,6 +352,21 @@ App = {
 
 	return dDisplay + hDisplay + mDisplay;
 	
+	},
+	
+	unixToYMD: function(unixTimeMS) {
+		var beginningDate = new Date(unixTimeMS);
+		console.log(beginningDate);
+		var beginningYear = beginningDate.getYear() - 100 + 2000;
+		var beginningMonth = beginningDate.getMonth() + 1;
+		var beginningDay = beginningDate.getDate();
+
+		console.log(beginningYear);
+		console.log(beginningMonth);
+		console.log(beginningDay);
+
+
+		return String(beginningYear) + "-" + String(beginningMonth) + "-" + String(beginningDay);
 	},
 
 	stakeSuccessTxHash: function(_modalID, tx) {

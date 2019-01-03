@@ -540,6 +540,7 @@ App = {
 
 	},
 
+	// TODO this is redundant. Collapse these two succesTXhash fns into one
 	statementSuccessTxHash: function(_modalID, tx) {
 		var url = "https://etherscan.io/tx/" + String(tx);
 		var s = "View your transaction on the blockchain <a href=" + url + " target='_blank'>here</a>"
