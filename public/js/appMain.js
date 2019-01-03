@@ -207,8 +207,14 @@ App = {
 			else {
 				var valueUSD = '($' + Math.round(App.priceUSD*ethStaked) + ')';
 			}
+
+			// Show top card expanded on load
+			var showCollapse = null;
+			if (s==0) {
+				showCollapse = "show";
+			}
 			
-			var html = App.collapsingCardHTMLformatLiveData(statementID, statementText, numStakes, ethStaked, valueUSD, statementSource, timeRemainingFormatted, stakeButtonHTML);
+			var html = App.collapsingCardHTMLformatLiveData(statementID, statementText, numStakes, ethStaked, valueUSD, statementSource, timeRemainingFormatted, stakeButtonHTML, showCollapse);
 
 			popularLiveStakesCards.append(html);
 
@@ -244,6 +250,10 @@ App = {
 				var verdict = "False"
 			}
 
+			if (App.priceUSD != null) {
+				var valueUSD = '($' + Math.round(App.priceUSD*ethStaked) + ')';
+			}
+
 			// Value in USD
 			if (App.priceUSD == null) {
 				var valueUSD = '';
@@ -252,7 +262,13 @@ App = {
 				var valueUSD = '($' + Math.round(App.priceUSD*ethStaked) + ')';
 			}
 
-			var html = App.collapsingCardHTMLformatPastData(statementID, statementText, numStakes, ethStaked, valueUSD, statementSource, stakeEndTime, verdict);
+			// Show top card expanded on load
+			var showCollapse = null;
+			if (s==0) {
+				showCollapse = "show";
+			}
+
+			var html = App.collapsingCardHTMLformatPastData(statementID, statementText, numStakes, ethStaked, valueUSD, statementSource, stakeEndTime, verdict, showCollapse);
 
 			popularPastStakesCards.append(html);
 
@@ -269,11 +285,11 @@ App = {
 	},
 
 
-	collapsingCardHTMLformatLiveData: function(statementID, statementText, numStakes, ethStaked, valueUSD, statementSource, timeRemainingFormatted, stakeButtonHTML) {
+	collapsingCardHTMLformatLiveData: function(statementID, statementText, numStakes, ethStaked, valueUSD, statementSource, timeRemainingFormatted, stakeButtonHTML, showCollapse) {
 
 		var html = `<div class="card bg-transparent border-0 mb-3" id="card${statementID}">
 		                
-		                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
+		                <div class="card-header bg-transparent text-center border-0" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
 		                    <button class="btn-default border-0 bg-light">
 		                    	<abbr class="text-center lead text-primary">${ethStaked} eth ${valueUSD}</abbr>
 		                      	<p class="font-weight-light">${statementText}</p>
@@ -281,9 +297,9 @@ App = {
 		                </div>
 
 
-		                <div class="card-body collapse" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}">
+		                <div class="card-body collapse ${showCollapse}" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}">
 
-			                <div class="card-body text-center">
+			                <div class="text-center">
 
 			                  	<form method="POST" onSubmit="App.makeStake(${statementID}, stakePosition${statementID}, stakeValue${statementID}); return false;">
 
@@ -361,10 +377,10 @@ App = {
 
 	},
 
-	collapsingCardHTMLformatPastData: function(statementID, statementText, numStakes, ethStaked, valueUSD, statementSource, stakeEndTime, verdict) {
+	collapsingCardHTMLformatPastData: function(statementID, statementText, numStakes, ethStaked, valueUSD, statementSource, stakeEndTime, verdict, showCollapse) {
 		var html = `<div class="card bg-transparent border-0 mb-3" id="card${statementID}">
 		                
-		                <div class="card-header bg-transparent text-center" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
+		                <div class="card-header bg-transparent text-center border-0" id="cardHeading${statementID}" data-toggle="collapse" data-target="#cardBodyCollapse${statementID}" aria-expanded="false" aria-controls="collapse${statementID}">
 		                    <button class="btn-default border-0 bg-light">
 		                    	<abbr class="text-center lead text-primary">${ethStaked} eth ${valueUSD}</abbr>
 			                    <p class="stake-table-statement font-weight-light lead">${statementText}</p>
@@ -373,7 +389,7 @@ App = {
 		                </div>
 
 
-		                <div class="card-body collapse" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}">
+		                <div class="card-body collapse ${showCollapse}" id="cardBodyCollapse${statementID}" aria-labelledby="heading${statementID}">
 
 			                <div class="card-body text-center">
 

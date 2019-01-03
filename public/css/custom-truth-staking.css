@@ -589,6 +589,26 @@ a:focus, a:hover {
 .white-link:hover {
   color: #C0C0C0;
 }
+
+/* Card borders */
+/*.card, .card-group .card-heading+.card-collapse>.card-body{
+   border: none;
+} */
+.card:not(:first-of-type):not(:last-of-type) {
+    border-bottom: none;
+    border-radius: none;
+}
+
+.card:first-of-type {
+    border-bottom-left-radius: none;
+    border-bottom-right-radius: none;
+}
+
+.card:last-of-type {
+    border-top-left-radius: none;
+    border-top-right-radius: none;
+}
+
 footer {
   padding: 5rem 0;
 }

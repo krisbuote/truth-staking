@@ -7,6 +7,7 @@ App = {
 	web3Provider: null,
 	contracts: {},
   	truthStakingContract: null,
+  	priceUSD: null,
   	allStatementsArray: [],
   	account: '0x0',
 
@@ -71,6 +72,11 @@ App = {
 	
 
 	getStatementDataAndBuildLiveTable: function(_numStatements, _contractInstance) {
+
+		// Get eth price in USD
+		$.get('https://api.coinmarketcap.com/v1/ticker/ethereum/', function(data, status) {
+			App.priceUSD = data[0].price_usd;
+		});
 
 		App.liveStatementsArray = [];
 
@@ -142,6 +148,7 @@ App = {
 
 			liveEthSum += Number(ethStaked);
 
+			//Remaining Time
 			var timeRemainingSeconds = stakeEndTime - Math.floor(Date.now()/1000);
 
 			if (timeRemainingSeconds > 0) {
@@ -151,15 +158,25 @@ App = {
 				var timeRemainingFormatted = "FINISHED"
 			}
 
+			// Value in USD
+			if (App.priceUSD == null) {
+				var valueUSD = '';
+			}
+			else {
+				var valueUSD = '($' + Math.round(App.priceUSD*ethStaked) + ')';
+			}
+
 			var stakeBeginningDate = App.unixToYMD(stakeBeginningTime*1000);
-			
+			var stakeBeginningDateHTML = `<div class="text-center">${stakeBeginningDate}</div>`
+
 			var cardHtml = App.collapsingCardHTMLformatLiveData(statementID, statementText, ethStaked, statementSource, timeRemainingFormatted, stakeEndTime, stakeButtonHTML);
 			var ethStakedHtml = `<div class="container" class="stake-table-eth text-center">
 									<h3>${ethStaked}</h3> 
 									<h4>ETH</h4>
+									<p class="text-center">${valueUSD}</p>
 								</div>`		
 
-			liveStatementsData.push([ethStakedHtml, cardHtml, stakeBeginningDate]);
+			liveStatementsData.push([ethStakedHtml, cardHtml, stakeBeginningDateHTML]);
 			
 		}
 
@@ -396,15 +413,9 @@ App = {
 
 	unixToYMD: function(unixTimeMS) {
 		var beginningDate = new Date(unixTimeMS);
-		console.log(beginningDate);
 		var beginningYear = beginningDate.getYear() - 100 + 2000;
 		var beginningMonth = beginningDate.getMonth() + 1;
 		var beginningDay = beginningDate.getDate();
-
-		console.log(beginningYear);
-		console.log(beginningMonth);
-		console.log(beginningDay);
-
 
 		return String(beginningYear) + "-" + String(beginningMonth) + "-" + String(beginningDay);
 	},

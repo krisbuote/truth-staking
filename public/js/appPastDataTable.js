@@ -6,6 +6,7 @@ App = {
 	web3Provider: null,
 	contracts: {},
   	truthStakingContract: null,
+  	priceUSD: null,
   	allStatementsArray: [],
   	pastStatementsArray: [],
   	account: '0x0',
@@ -86,6 +87,12 @@ App = {
 
 	getStatementDataAndBuildPastTable: function(_numStatements, _contractInstance) {
 
+		// Get eth price in USD
+		$.get('https://api.coinmarketcap.com/v1/ticker/ethereum/', function(data, status) {
+			App.priceUSD = data[0].price_usd;
+		});
+
+
 		App.pastStatementsArray = [];
 
 		for (var i = 0; i < _numStatements; i++) {
@@ -161,15 +168,26 @@ App = {
 				var verdict = "False"
 			}
 
+			// Value in USD
+			if (App.priceUSD == null) {
+				var valueUSD = '';
+			}
+			else {
+				var valueUSD = '($' + Math.round(App.priceUSD*ethStaked) + ')';
+			}
+
 			var cardHtml = App.collapsingCardHTMLformatPastData(statementID, statementText, numStakes, ethStaked, statementSource, stakeEndTime, verdict);
 			var ethStakedHtml = `<div class="container" class="stake-table-eth text-center">
 									<h3>${ethStaked}</h3> 
 									<h4>ETH</h4>
+									<p class="text-center">${valueUSD}</p>
 								</div>`
 
 			var stakeBeginningDate = App.unixToYMD(stakeBeginningTime*1000);
+			var stakeBeginningDateHTML = `<div class="text-center">${stakeBeginningDate}</div>`
 
-			pastStatementsData.push([ethStakedHtml, cardHtml, stakeBeginningDate]);
+
+			pastStatementsData.push([ethStakedHtml, cardHtml, stakeBeginningDateHTML]);
 			
 
 		}
@@ -356,15 +374,9 @@ App = {
 	
 	unixToYMD: function(unixTimeMS) {
 		var beginningDate = new Date(unixTimeMS);
-		console.log(beginningDate);
 		var beginningYear = beginningDate.getYear() - 100 + 2000;
 		var beginningMonth = beginningDate.getMonth() + 1;
 		var beginningDay = beginningDate.getDate();
-
-		console.log(beginningYear);
-		console.log(beginningMonth);
-		console.log(beginningDay);
-
 
 		return String(beginningYear) + "-" + String(beginningMonth) + "-" + String(beginningDay);
 	},
