@@ -461,6 +461,10 @@
 
 }
 
+.faq-card-button {
+  white-space: normal;
+}
+
 .about-page h4 {
   margin-left: 10rem 0;
 }
