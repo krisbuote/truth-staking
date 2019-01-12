@@ -12,30 +12,30 @@ var
 
   // folders
   folder = {
-    src: 'src/',
+    src: 'public/',
     build: 'build/'
   }
 ;
 
 // image processing
 gulp.task('images', function() {
-  var out = folder.build + 'images/';
-  return gulp.src(folder.src + 'images/**/*')
+  var out = folder.build + 'img/';
+  return gulp.src(folder.src + 'img/**/*')
     .pipe(newer(out))
     .pipe(imagemin({ optimizationLevel: 5 }))
     .pipe(gulp.dest(out));
 });
 
-// HTML processing
-gulp.task('html', ['images'], function() {
-  var out = folder.build + 'html/',
-    page = gulp.src(folder.src + 'html/**/*')
-      .pipe(newer(out));
+// // HTML processing
+// gulp.task('html', ['images'], function() {
+//   var out = folder.build + 'html/',
+//     page = gulp.src(folder.src + 'html/**/*')
+//       .pipe(newer(out));
 
-  // minify production code
-  if (!devBuild) {
-    page = page.pipe(htmlclean());
-  }
+//   // minify production code
+//   if (!devBuild) {
+//     page = page.pipe(htmlclean());
+//   }
 
-  return page.pipe(gulp.dest(out));
-});
+//   return page.pipe(gulp.dest(out));
+// });
