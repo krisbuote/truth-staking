@@ -205,12 +205,14 @@ App = {
 			// Value in USD
 			if (App.priceUSD == null) {
 				var valueUSD = '';
-				var priceUSD = null;
+				var USDequivalentHTML = '';
+
 
 			}
 			else {
 				var valueUSD = '($' + Math.round(App.priceUSD*ethStaked) + ')';
-				var priceUSD = Math.round(App.priceUSD);
+				var USDequivalentHTML = `<input type="hidden" id="priceUSD" name="priceUSD" value="${Math.round(App.priceUSD)}">
+										($<output name="USDequivalent${statementID}" id="USDequivalent${statementID}" for="priceUSD stakeValue${statementID}">0</output>)`
 			}
 
 			// Show top card expanded on load
@@ -220,7 +222,7 @@ App = {
 			}
 			
 
-			var html = App.collapsingCardHTMLformatLiveData(statementID, statementText, numStakes, ethStaked, valueUSD, statementSource, timeRemainingFormatted, stakeButtonHTML, showCollapse, priceUSD);
+			var html = App.collapsingCardHTMLformatLiveData(statementID, statementText, numStakes, ethStaked, valueUSD, statementSource, timeRemainingFormatted, stakeButtonHTML, showCollapse, USDequivalentHTML);
 
 			popularLiveStakesCards.append(html);
 
@@ -256,16 +258,12 @@ App = {
 				var verdict = "False"
 			}
 
-			if (App.priceUSD != null) {
-				var valueUSD = '($' + Math.round(App.priceUSD*ethStaked) + ')';
-			}
-
 			// Value in USD
 			if (App.priceUSD == null) {
 				var valueUSD = '';
 			}
 			else {
-				var valueUSD = '($' + Math.round(App.priceUSD*ethStaked) + ')';
+				var valueUSD = '($' + Math.round(App.priceUSD*ethStaked) + ')';	
 			}
 
 
@@ -292,7 +290,7 @@ App = {
 	},
 
 
-	collapsingCardHTMLformatLiveData: function(statementID, statementText, numStakes, ethStaked, valueUSD, statementSource, timeRemainingFormatted, stakeButtonHTML, showCollapse, priceUSD) {
+	collapsingCardHTMLformatLiveData: function(statementID, statementText, numStakes, ethStaked, valueUSD, statementSource, timeRemainingFormatted, stakeButtonHTML, showCollapse, USDequivalentHTML) {
 
 		var html = `<div class="card bg-transparent border-0 mb-3" id="card${statementID}">
 		                
@@ -334,8 +332,7 @@ App = {
 									    	<div class="col-md-4 offset-md-4">
 									    		<span>
 											    	<input class="form-control text-center"  type="number" id="stakeValue${statementID}" placeholder="0.750 ether" step="0.00001"/>
-											    	<input type="hidden" id="priceUSD" name="priceUSD" value="${priceUSD}">
-											    	($<output name="USDequivalent${statementID}" id="USDequivalent${statementID}" for="priceUSD stakeValue${statementID}">0</output>)
+											    	${USDequivalentHTML}
 										    	</span>
 											</div>
 										</div>
