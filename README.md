@@ -1,23 +1,29 @@
 # Truth Staking
 
-
-# Crow Truth Staking DApp
+## Overview
 
 A decentralized application that allows the crowd to stake money on the truthfulness of claims made by the media.
 
---- WORK IN PROGRESS ---
+[truthstaking.com](http://truthstaking.com)
 
-## Requirements
+[Watch a video here](https://www.youtube.com/watch?v=EghSqZ1hxnc&ab_channel=TruthStaking)
+
+The crowd stakes ETH on a claim made in the media as being True or False. After a period of time elapses, the majority wins and shares the distributed stakes from the minority.
+
+The idea is to percolate truth through financial markets - somewhat similar to prediction markets. 
+
+Game theory flaws exist. It's a first attempt at an important problem.
+
+
+## Developer Setup
+### Requirements
 + [node](https://nodejs.org/en/)
 + [truffle](https://www.npmjs.com/package/truffle)
 + [ganache](https://truffleframework.com/ganache)
 + [metamask](https://metamask.io/)
-
-
-## Documentation
+### Documentation
 
 0. Install Ganache, truffle, node, metamask
-
 1. To get working full-stack template: $truffle unbox pet-shop 
 2. To compile smart contracts and build the .json: $truffle compile
 3. have ganache open
