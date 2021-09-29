@@ -2,7 +2,7 @@
 
 ## Overview
 
-A decentralized application that allows the crowd to stake money on the truthfulness of claims made by the media.
+A decentralized application that allows the crowd to stake ether on the truthfulness of claims made by the media. If your peers agree with you, you win.
 
 [truthstaking.com](http://truthstaking.com)
 
@@ -13,6 +13,14 @@ The crowd stakes ETH on a claim made in the media as being True or False. After 
 The idea is to percolate truth through financial markets - somewhat similar to prediction markets. 
 
 Game theory flaws exist. It's a first attempt at an important problem.
+
+## Truth Staking Smart Contract
+* This smart contract allows users to do 2 things:
+* 1) Submit statements that are TRUE or FALSE.
+* 2) Stake on submitted statements.
+* After the staking period for the statement ends, the TRUE and FALSE pots of ether are counted. 
+* The larger pot wins, and the smaller pot is distributed amongst the winners, proportional to the size of their stakes.
+* The "market maker" (the address that submitted the statement) receives an extra reward proportional to her first stake.
 
 
 ## Developer Setup
